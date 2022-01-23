@@ -37,8 +37,8 @@
 				"description": "IP address or hostname of your OXRS device"
 			},
 			"action": {
-				"enum": [ "config", "command" ],
-				"enumNames": [ "Edit Config", "Send Command" ],
+				"enum": [ "mqtt", "config", "command", "ota" ],
+				"enumNames": [ "Setup MQTT", "Edit Config", "Send Command", "OTA Update" ],
 				"title": "Action",
 				"description": "Administrative action to perform on your OXRS device"
 			}
@@ -56,9 +56,9 @@
 		}
 	};
 
-	/* JSON data for initial address page - default to 'Edit Config' */
+	/* JSON data for initial address page - default to 'Setup MQTT' */
 	const addressData = {
-		"action": "config"
+		"action": "mqtt"
 	};
 
 
@@ -70,7 +70,7 @@
 	 */
 	function loadConfigForm(device_address)
 	{
-		$.when(getAdopt(device_address), getConfig(device_address))
+		$.when(getApi(device_address, "adopt"), getApi(device_address, "config"))
 			.done(function(adopt, config)
 			{
 				// Hide other forms
@@ -88,7 +88,7 @@
 					formData: configData,
 					onSubmit: function(data)
 					{
-						sendConfig(device_address, data.formData);
+						postApi(device_address, "config", data.formData);
 					}
 				}),
 				document.getElementById("conf_form"));
@@ -108,7 +108,7 @@
 	 */
 	function loadCommandForm(device_address)
 	{
-		$.when(getAdopt(device_address))
+		$.when(getApi(device_address, "adopt"))
 			.done(function(data, statusText, jqXHR)
 			{
 				// Hide other forms
@@ -124,7 +124,7 @@
 					schema: commandSchema,
 					onSubmit: function(data)
 					{
-						sendCommand(device_address, data.formData);
+						postApi(device_address, "command", data.formData);
 					}
 				}),
 				document.getElementById("cmnd_form"));
@@ -137,15 +137,16 @@
 
 
 	/**
-	 * Get adoption details from device
+	 * Create API GET request
 	 *
 	 * @param {string} device_address Device IP address
+	 * @param {string} endpoint API endpoint
 	 * @returns {Promise} A promise to the AJAX request
 	 */
-	function getAdopt(device_address)
+	function getApi(device_address, endpoint)
 	{
 		return $.ajax({
-			url: `http://${device_address}/api/adopt`,
+			url: `http://${device_address}/api/${endpoint}`,
 			method: 'GET',
 			dataType: 'json',
 			crossDomain: true
@@ -154,67 +155,24 @@
 
 
 	/**
-	 * Get config from device
+	 * Create API POST request
 	 *
 	 * @param {string} device_address Device IP address
-	 * @returns {Promise} A promise to the AJAX request
-	 */
-	function getConfig(device_address)
-	{
-		return $.ajax({
-			url: `http://${device_address}/api/config`,
-			method: 'GET',
-			dataType: 'json',
-			crossDomain: true
-		});
-	}
-
-
-	/**
-	 * Sends config to device
-	 *
-	 * @param {string} device_address Device IP address
-	 * @param {json} config Config data
+	 * @param {string} endpoint API endpoint
+	 * @param {json} data API payload
 	 * @returns {void}
 	 */
-	function sendConfig(device_address, config)
+	function postApi(device_address, endpoint, data)
 	{
 		$.ajax({
-			url: `http://${device_address}/api/config`,
+			url: `http://${device_address}/api/${endpoint}`,
 			method: 'POST',
 			crossDomain: true,
-			data: JSON.stringify(config),
+			data: JSON.stringify(data),
 			statusCode:
 			{
 				404: function() { alert("Error: Device not found"); },
-				204: function() { alert("Config updated!"); },
-			},
-			error: function(xhr, status, error)
-			{
-				alert(error || 'Unknown error');
-			}
-		});
-	}
-
-
-	/**
-	 * Sends command to device
-	 *
-	 * @param {string} device_address Device IP address
-	 * @param {json} command Command data
-	 * @returns {void}
-	 */
-	function sendCommand(device_address, command)
-	{
-		$.ajax({
-			url: `http://${device_address}/api/command`,
-			method: 'POST',
-			crossDomain: true,
-			data: JSON.stringify(command),
-			statusCode:
-			{
-				404: function() { alert("Error: Device not found"); },
-				204: function() { alert("Command sent!"); },
+				204: function() { alert("Success!"); },
 			},
 			error: function(xhr, status, error)
 			{
@@ -242,10 +200,14 @@
 				onSubmit: function(data)
 				{
 					// Load the form for the selected action
-					if (data.formData.action === "config") {
+					if (data.formData.action === "mqtt") {
+						window.location.href = `http://${data.formData.address}`;
+					} else if (data.formData.action === "config") {
 						loadConfigForm(data.formData.address);
 					} else if (data.formData.action === "command") {
 						loadCommandForm(data.formData.address);
+					} else if (data.formData.action === "ota") {
+						window.location.href = `http://${data.formData.address}/ota`;
 					} else {
 						alert(`Unsupported action: ${data.formData.action}`);
 					}
