@@ -20,7 +20,7 @@
 	</style>
 
 	<script>
-  
+
 	const addr_form = JSONSchemaForm.default;
 	const conf_form = JSONSchemaForm.default;
 	const cmnd_form = JSONSchemaForm.default;
@@ -34,21 +34,22 @@
 				"type": "string",
 				"title": "Device Address"
 			},
-      "action": {
-        "enum": [ "config", "command" ],
-        "enumNames": [ "Update Config", "Send Command" ],
+			"action": {
+				"enum": [ "config", "command" ],
+				"enumNames": [ "Update Config", "Send Command" ],
 				"title": "Action"
-      }
+			}
 		},
-    "required": [ 
-      "address",
-      "action"
-    ]
+		"required": [
+			"address",
+			"action"
+		]
 	};
 
-  const addressData = {
-    "action": "config"
-  };
+	const addressData = {
+		"action": "config"
+	};
+
 
 	/**
 	 * Loads firmware config form
@@ -58,16 +59,13 @@
 	 */
 	function loadConfigForm(device_address)
 	{
-    $.when(getAdopt(device_address), getConfig(device_address))
-      .done(function(adopt, config) {
-        // Each argument is an array with [ data, statusText, jqXHR ]
-        if (adopt[2].status != 200) {
-          alert("Failed to load adoption details: " + adopt[1]);
-        }
-        if (config[2].status != 200) {
-          alert("Failed to load existing config: " + config[1]);
-        }
-    
+		$.when(getAdopt(device_address), getConfig(device_address))
+			.done(function(adopt, config)
+			{
+				// Each argument is an array with [ data, statusText, jqXHR ]
+				if (adopt[2].status != 200) alert(`Failed to load adoption details: ${adopt[1]}`);
+				if (config[2].status != 200) alert(`Failed to load existing config: ${config[1]}`);
+
 				// Hide other forms
 				$('#addr_form').hide('fast');
 				$('#cmnd_form').hide('fast');
@@ -75,18 +73,22 @@
 				// Render config form
 				ReactDOM.render( /*#__PURE__*/
 				React.createElement(conf_form,
+				{
+					schema: adopt[0].configSchema,
+					formData: config[0],
+					onSubmit: function(data)
 					{
-						schema: adopt[0].configSchema,
-            formData: config[0],
-						onSubmit: function(data)
-						{
-							sendConfig(device_address, data.formData);
-						}
-					}),
-					document.getElementById("conf-form")
-				);
-      });
- 	}
+						sendConfig(device_address, data.formData);
+					}
+				}),
+				document.getElementById("conf_form"));
+			})
+			.fail(function()
+			{
+				alert(`Failed to load existing config`);
+			});
+	}
+
 
 	/**
 	 * Loads firmware command form
@@ -96,12 +98,13 @@
 	 */
 	function loadCommandForm(device_address)
 	{
-    $.when(getAdopt(device_address))
-      .done(function(data, statusText, jqXHR) {
-        if (jqXHR.status != 200) {
-          alert("Failed to load adoption details: " + statusText);
-        }
-        
+		$.when(getAdopt(device_address))
+			.done(function(data, statusText, jqXHR)
+			{
+				if (jqXHR.status != 200) {
+					alert(`Failed to load adoption details: ${statusText}`);
+				}
+
 				// Hide other forms
 				$('#addr_form').hide('fast');
 				$('#conf_form').hide('fast');
@@ -109,48 +112,56 @@
 				// Render command form
 				ReactDOM.render( /*#__PURE__*/
 				React.createElement(cmnd_form,
+				{
+					schema: data.commandSchema,
+					onSubmit: function(data)
 					{
-						schema: data.commandSchema,
-						onSubmit: function(data)
-						{
-							sendCommand(device_address, data.formData);
-						}
-					}),
-					document.getElementById("cmnd-form")
-				);
-      });
+						sendCommand(device_address, data.formData);
+					}
+				}),
+				document.getElementById("cmnd_form"));
+			})
+			.fail(function()
+			{
+				alert(`Failed to load adoption details`);
+			});
 	}
 
-  /**
-   * Get adoption details from device
-   *
-	 * @param {string} device_address Device IP address
-	 * @returns {Promise} A promise to the AJAX request
-   */  
-  function getAdopt(device_address) {
-    return $.ajax({
-			url: `http://${device_address}/api/adopt`,
-      method: 'GET',
-			dataType: 'json',
-			crossDomain: true
-    });
-  }
 
-  /**
-   * Get config from device
-   *
+	/**
+	 * Get adoption details from device
+	 *
 	 * @param {string} device_address Device IP address
 	 * @returns {Promise} A promise to the AJAX request
-   */  
-  function getConfig(device_address) {
-    return $.ajax({
-			url: `http://${device_address}/api/config`,
-      method: 'GET',
+	 */
+	function getAdopt(device_address)
+	{
+		return $.ajax({
+			url: `http://${device_address}/api/adopt`,
+			method: 'GET',
 			dataType: 'json',
 			crossDomain: true
-    });
-  }
-  
+		});
+	}
+
+
+	/**
+	 * Get config from device
+	 *
+	 * @param {string} device_address Device IP address
+	 * @returns {Promise} A promise to the AJAX request
+	 */
+	function getConfig(device_address)
+	{
+		return $.ajax({
+			url: `http://${device_address}/api/config`,
+			method: 'GET',
+			dataType: 'json',
+			crossDomain: true
+		});
+	}
+
+
 	/**
 	 * Sends config to device
 	 *
@@ -165,7 +176,8 @@
 			method: 'POST',
 			crossDomain: true,
 			data: JSON.stringify(config),
-			statusCode: {
+			statusCode:
+			{
 				404: function() { alert("Error: Device not found"); },
 				204: function() { alert("Config updated!"); },
 			},
@@ -175,7 +187,8 @@
 			}
 		});
 	}
-  
+
+
 	/**
 	 * Sends command to device
 	 *
@@ -190,7 +203,8 @@
 			method: 'POST',
 			crossDomain: true,
 			data: JSON.stringify(command),
-			statusCode: {
+			statusCode:
+			{
 				404: function() { alert("Error: Device not found"); },
 				204: function() { alert("Command sent!"); },
 			},
@@ -200,7 +214,8 @@
 			}
 		});
 	}
-  
+
+
 	/**
 	 * Main program: loads inital device address form
 	 * Called once all elements are ready/loaded
@@ -214,17 +229,17 @@
 			React.createElement(addr_form,
 			{
 				schema: addressSchema,
-        formData: addressData,
+				formData: addressData,
 				onSubmit: function(data)
 				{
-          // Load the form for the selected action
-          if (data.formData.action === "config") {
-            loadConfigForm(data.formData.address);
-          } else if (data.formData.action === "command") {
-            loadCommandForm(data.formData.address);
-          } else {
-            alert('Unsupported action: ' + data.formData.action);
-          }
+					// Load the form for the selected action
+					if (data.formData.action === "config") {
+						loadConfigForm(data.formData.address);
+					} else if (data.formData.action === "command") {
+						loadCommandForm(data.formData.address);
+					} else {
+						alert(`Unsupported action: ${data.formData.action}`);
+					}
 				}
 			}),
 			document.getElementById("addr_form")
@@ -242,10 +257,10 @@
 		<div id="addr_form"></div>
 	</div>
 	<div class="container">
-		<div id="conf-form"></div>
+		<div id="conf_form"></div>
 	</div>
 	<div class="container">
-		<div id="cmnd-form"></div>
+		<div id="cmnd_form"></div>
 	</div>
 </body>
 
