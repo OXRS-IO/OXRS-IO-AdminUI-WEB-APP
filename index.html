@@ -25,6 +25,7 @@
 	const conf_form = JSONSchemaForm.default;
 	const cmnd_form = JSONSchemaForm.default;
 
+	/* JSON schema for initial address page */
 	const addressSchema = {
 		"$schema": "http://json-schema.org/draft-07/schema#",
 		"title": "OXRS Admin",
@@ -46,6 +47,7 @@
 		]
 	};
 
+	/* JSON data for initial address page - default to 'Update Config' */
 	const addressData = {
 		"action": "config"
 	};
@@ -85,7 +87,7 @@
 			})
 			.fail(function()
 			{
-				alert(`Failed to load existing config`);
+				alert(`Failed to load config action`);
 			});
 	}
 
@@ -123,7 +125,7 @@
 			})
 			.fail(function()
 			{
-				alert(`Failed to load adoption details`);
+				alert(`Failed to load command action`);
 			});
 	}
 
