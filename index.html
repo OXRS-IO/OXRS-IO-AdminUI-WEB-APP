@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+	<title>OXRS Admin</title>
+
+	<link href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet">
+
+	<script src="https://unpkg.com/react@17/umd/react.production.min.js" crossorigin></script>
+	<script src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js" crossorigin></script>
+	<script src="https://unpkg.com/@rjsf/core/dist/react-jsonschema-form.js"></script>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+	<style>
+		.container { margin-top: 2rem; margin-bottom: 2rem; }
+	</style>
+
+	<script>
+  
+	const addr_form = JSONSchemaForm.default;
+	const conf_form = JSONSchemaForm.default;
+	const cmnd_form = JSONSchemaForm.default;
+
+	const addressSchema = {
+		"$schema": "http://json-schema.org/draft-07/schema#",
+		"title": "OXRS Admin",
+		"type": "object",
+		"properties": {
+			"address": {
+				"type": "string",
+				"title": "Device Address"
+			},
+      "action": {
+        "enum": [ "config", "command" ],
+        "enumNames": [ "Update Config", "Send Command" ],
+				"title": "Action"
+      }
+		},
+    "required": [ 
+      "address",
+      "action"
+    ]
+	};
+
+  const addressData = {
+    "action": "config"
+  };
+
+	/**
+	 * Loads firmware config form
+	 *
+	 * @param {string} device_address Device address (IP or hostname)
+	 * @returns {void}
+	 */
+	function loadConfigForm(device_address)
+	{
+    $.when(getAdopt(device_address), getConfig(device_address))
+      .done(function(adopt, config) {
+        // Each argument is an array with [ data, statusText, jqXHR ]
+        if (adopt[2].status != 200) {
+          alert("Failed to load adoption details: " + adopt[1]);
+        }
+        if (config[2].status != 200) {
+          alert("Failed to load existing config: " + config[1]);
+        }
+    
+				// Hide other forms
+				$('#addr_form').hide('fast');
+				$('#cmnd_form').hide('fast');
+
+				// Render config form
+				ReactDOM.render( /*#__PURE__*/
+				React.createElement(conf_form,
+					{
+						schema: adopt[0].configSchema,
+            formData: config[0],
+						onSubmit: function(data)
+						{
+							sendConfig(device_address, data.formData);
+						}
+					}),
+					document.getElementById("conf-form")
+				);
+      });
+ 	}
+
+	/**
+	 * Loads firmware command form
+	 *
+	 * @param {string} device_address Device address (IP or hostname)
+	 * @returns {void}
+	 */
+	function loadCommandForm(device_address)
+	{
+    $.when(getAdopt(device_address))
+      .done(function(data, statusText, jqXHR) {
+        if (jqXHR.status != 200) {
+          alert("Failed to load adoption details: " + statusText);
+        }
+        
+				// Hide other forms
+				$('#addr_form').hide('fast');
+				$('#conf_form').hide('fast');
+
+				// Render command form
+				ReactDOM.render( /*#__PURE__*/
+				React.createElement(cmnd_form,
+					{
+						schema: data.commandSchema,
+						onSubmit: function(data)
+						{
+							sendCommand(device_address, data.formData);
+						}
+					}),
+					document.getElementById("cmnd-form")
+				);
+      });
+	}
+
+  /**
+   * Get adoption details from device
+   *
+	 * @param {string} device_address Device IP address
+	 * @returns {Promise} A promise to the AJAX request
+   */  
+  function getAdopt(device_address) {
+    return $.ajax({
+			url: `http://${device_address}/api/adopt`,
+      method: 'GET',
+			dataType: 'json',
+			crossDomain: true
+    });
+  }
+
+  /**
+   * Get config from device
+   *
+	 * @param {string} device_address Device IP address
+	 * @returns {Promise} A promise to the AJAX request
+   */  
+  function getConfig(device_address) {
+    return $.ajax({
+			url: `http://${device_address}/api/config`,
+      method: 'GET',
+			dataType: 'json',
+			crossDomain: true
+    });
+  }
+  
+	/**
+	 * Sends config to device
+	 *
+	 * @param {string} device_address Device IP address
+	 * @param {json} config Config data
+	 * @returns {void}
+	 */
+	function sendConfig(device_address, config)
+	{
+		$.ajax({
+			url: `http://${device_address}/api/config`,
+			method: 'POST',
+			crossDomain: true,
+			data: JSON.stringify(config),
+			statusCode: {
+				404: function() { alert("Error: Device not found"); },
+				204: function() { alert("Config updated!"); },
+			},
+			error: function(xhr, status, error)
+			{
+				alert(error || 'Unknown error');
+			}
+		});
+	}
+  
+	/**
+	 * Sends command to device
+	 *
+	 * @param {string} device_address Device IP address
+	 * @param {json} command Command data
+	 * @returns {void}
+	 */
+	function sendCommand(device_address, command)
+	{
+		$.ajax({
+			url: `http://${device_address}/api/command`,
+			method: 'POST',
+			crossDomain: true,
+			data: JSON.stringify(command),
+			statusCode: {
+				404: function() { alert("Error: Device not found"); },
+				204: function() { alert("Command sent!"); },
+			},
+			error: function(xhr, status, error)
+			{
+				alert(error || 'Unknown error');
+			}
+		});
+	}
+  
+	/**
+	 * Main program: loads inital device address form
+	 * Called once all elements are ready/loaded
+	 *
+	 * @returns {void}
+	 */
+	$(document).ready(function()
+	{
+		// Render device address form
+		ReactDOM.render( /*#__PURE__*/
+			React.createElement(addr_form,
+			{
+				schema: addressSchema,
+        formData: addressData,
+				onSubmit: function(data)
+				{
+          // Load the form for the selected action
+          if (data.formData.action === "config") {
+            loadConfigForm(data.formData.address);
+          } else if (data.formData.action === "command") {
+            loadCommandForm(data.formData.address);
+          } else {
+            alert('Unsupported action: ' + data.formData.action);
+          }
+				}
+			}),
+			document.getElementById("addr_form")
+		);
+
+		// Set placeholder string on input
+		$('#root_address').attr('placeholder', 'IP address or hostname...');
+	});
+	</script>
+
+</head>
+
+<body>
+	<div class="container">
+		<div id="addr_form"></div>
+	</div>
+	<div class="container">
+		<div id="conf-form"></div>
+	</div>
+	<div class="container">
+		<div id="cmnd-form"></div>
+	</div>
+</body>
+
+</html>
