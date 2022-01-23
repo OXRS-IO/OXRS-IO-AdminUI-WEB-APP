@@ -1,3 +1,5 @@
 # Web based administrator UI for [OXRS](https://oxrs.io)
 
-See [here](https://oxrs.io/docs/applications/web-adminui-app.html) for documentation.
+Download `index.html` to your local machine and open in your favourite web browser.
+
+NOTE: requires OXRS firmware with v2.0.0+ of the OXRS-IO-API-ESP32-LIB library.
