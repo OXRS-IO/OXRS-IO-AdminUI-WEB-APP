@@ -33,12 +33,14 @@
 		"properties": {
 			"address": {
 				"type": "string",
-				"title": "Device Address"
+				"title": "Device Address",
+				"description": "IP address or hostname of your OXRS device"
 			},
 			"action": {
 				"enum": [ "config", "command" ],
-				"enumNames": [ "Update Config", "Send Command" ],
-				"title": "Action"
+				"enumNames": [ "Edit Config", "Send Command" ],
+				"title": "Action",
+				"description": "Administrative action to perform on your OXRS device"
 			}
 		},
 		"required": [
@@ -47,7 +49,14 @@
 		]
 	};
 
-	/* JSON data for initial address page - default to 'Update Config' */
+	const addressUiSchema = {
+		"address": {
+			"ui:placeholder": "192.168.1.123 or oxrs.local",
+			"ui:autofocus": true
+		}
+	};
+
+	/* JSON data for initial address page - default to 'Edit Config' */
 	const addressData = {
 		"action": "config"
 	};
@@ -67,13 +76,16 @@
 				// Hide other forms
 				$('#addr_form').hide('fast');
 				$('#cmnd_form').hide('fast');
+        
+				var configSchema = adopt[0].configSchema;
+				var configData = config[0];
 
 				// Render config form
 				ReactDOM.render( /*#__PURE__*/
 				React.createElement(conf_form,
 				{
-					schema: adopt[0].configSchema,
-					formData: config[0],
+					schema: configSchema,
+					formData: configData,
 					onSubmit: function(data)
 					{
 						sendConfig(device_address, data.formData);
@@ -102,12 +114,14 @@
 				// Hide other forms
 				$('#addr_form').hide('fast');
 				$('#conf_form').hide('fast');
+        
+				var commandSchema = data.commandSchema;
 
 				// Render command form
 				ReactDOM.render( /*#__PURE__*/
 				React.createElement(cmnd_form,
 				{
-					schema: data.commandSchema,
+					schema: commandSchema,
 					onSubmit: function(data)
 					{
 						sendCommand(device_address, data.formData);
@@ -223,6 +237,7 @@
 			React.createElement(addr_form,
 			{
 				schema: addressSchema,
+				uiSchema: addressUiSchema,
 				formData: addressData,
 				onSubmit: function(data)
 				{
@@ -238,9 +253,6 @@
 			}),
 			document.getElementById("addr_form")
 		);
-
-		// Set placeholder string on input
-		$('#root_address').attr('placeholder', 'IP address or hostname...');
 	});
 	</script>
 
