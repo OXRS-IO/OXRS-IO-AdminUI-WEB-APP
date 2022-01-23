@@ -64,10 +64,6 @@
 		$.when(getAdopt(device_address), getConfig(device_address))
 			.done(function(adopt, config)
 			{
-				// Each argument is an array with [ data, statusText, jqXHR ]
-				if (adopt[2].status != 200) alert(`Failed to load adoption details: ${adopt[1]}`);
-				if (config[2].status != 200) alert(`Failed to load existing config: ${config[1]}`);
-
 				// Hide other forms
 				$('#addr_form').hide('fast');
 				$('#cmnd_form').hide('fast');
@@ -103,10 +99,6 @@
 		$.when(getAdopt(device_address))
 			.done(function(data, statusText, jqXHR)
 			{
-				if (jqXHR.status != 200) {
-					alert(`Failed to load adoption details: ${statusText}`);
-				}
-
 				// Hide other forms
 				$('#addr_form').hide('fast');
 				$('#conf_form').hide('fast');
