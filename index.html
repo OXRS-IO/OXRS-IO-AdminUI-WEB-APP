@@ -197,6 +197,7 @@
 					validate: mqttValidate,
 					formData: mqttData,
 					showErrorList: false,
+					onError: onError,
 					onSubmit: function(data)
 					{
 						postApi(device_address, "mqtt", data.formData);
@@ -206,7 +207,7 @@
 			})
 			.fail(function()
 			{
-				showAlert(`Failed to load MQTT action`);
+				showAlert("Failed to load MQTT action");
 			});
 	}
 
@@ -246,6 +247,7 @@
 					schema: configSchema,
 					formData: configData,
 					showErrorList: false,
+					onError: onError,
 					onSubmit: function(data)
 					{
 						postApi(device_address, "config", data.formData);
@@ -255,7 +257,7 @@
 			})
 			.fail(function()
 			{
-				showAlert(`Failed to load config action`);
+				showAlert("Failed to load config action");
 			});
 	}
 
@@ -281,6 +283,7 @@
 				{
 					schema: commandSchema,
 					showErrorList: false,
+					onError: onError,
 					onSubmit: function(data)
 					{
 						postApi(device_address, "command", data.formData);
@@ -290,7 +293,7 @@
 			})
 			.fail(function()
 			{
-				showAlert(`Failed to load command action`);
+				showAlert("Failed to load command action");
 			});
 	}
 
@@ -318,6 +321,7 @@
 					uiSchema: firmwareUiSchema,
 					formData: firmwareData,
 					showErrorList: false,
+					onError: onError,
 					onSubmit: function(data)
 					{
 						postApiOta(device_address, data.formData.otaFirmware);
@@ -327,7 +331,7 @@
 			})
 			.fail(function()
 			{
-				showAlert(`Failed to load firmware action`);
+				showAlert("Failed to load firmware action");
 			});
 	}
 
@@ -408,6 +412,18 @@
 				showAlert(error || "Unknown error", "danger");
 			}
 		});
+	}
+
+	function onError(errors)
+	{
+		$('.alert_container').html(`<div></div>`);
+
+		for (let i = 0; i < errors.length; i++)
+		{
+			$('.alert_container').append(`<div class="alert alert-danger" role="alert">${errors[i].stack}</div>`);
+		}
+    
+		$('.alert_container').show('fast');
 	}
 
 	function showAlert(msg, type)
