@@ -22,8 +22,10 @@
 	<script>
 
 	const addr_form = JSONSchemaForm.default;
+	const mqtt_form = JSONSchemaForm.default;
 	const conf_form = JSONSchemaForm.default;
 	const cmnd_form = JSONSchemaForm.default;
+	const fw_form = JSONSchemaForm.default;
 
 	/* JSON schema for initial address page */
 	const addressSchema = {
@@ -37,8 +39,8 @@
 				"description": "IP address or hostname of your OXRS device"
 			},
 			"action": {
-				"enum": [ "mqtt", "config", "command", "ota" ],
-				"enumNames": [ "Setup MQTT", "Edit Config", "Send Command", "OTA Update" ],
+				"enum": [ "mqtt", "config", "command", "firmware" ],
+				"enumNames": [ "Setup MQTT", "Edit Config", "Send Command", "View Firmware" ],
 				"title": "Action",
 				"description": "Administrative action to perform on your OXRS device"
 			}
@@ -56,11 +58,171 @@
 		}
 	};
 
-	/* JSON data for initial address page - default to 'Setup MQTT' */
-	const addressData = {
-		"action": "mqtt"
+
+	/* JSON schema for MQTT setup page */
+	const mqttSchema = {
+		"$schema": "http://json-schema.org/draft-07/schema#",
+		"title": "OXRS MQTT",
+		"type": "object",
+		"properties": {
+			"broker": {
+				"type": "string",
+				"title": "Broker Address"
+			},
+			"port": {
+				"type": "string",
+				"title": "Broker Port"
+			},
+			"clientId": {
+				"type": "string",
+				"title": "Client ID"
+			},
+			"username": {
+				"type": "string",
+				"title": "Username"
+			},
+			"password": {
+				"type": "string",
+				"title": "Password"
+			},
+			"topicPrefix": {
+				"type": "string",
+				"title": "Topic Prefix"
+			},
+			"topicSuffix": {
+				"type": "string",
+				"title": "Topic Suffix"
+			}
+		},
+		"required": [
+			"broker",
+			"clientId"
+		]
 	};
 
+	const mqttUiSchema = {
+		"broker": {
+			"ui:placeholder": "192.168.1.123 or mqtt.local",
+			"ui:autofocus": true
+		},
+		"port": {
+			"ui:placeholder": "1883"
+		},
+		"password": {
+			"ui:widget": "password"
+		}
+	};
+
+
+	/* JSON schema for firmware page */
+	const firmwareSchema = {
+		"$schema": "http://json-schema.org/draft-07/schema#",
+		"title": "OXRS Firmware",
+		"type": "object",
+		"properties": {
+			"name": {
+				"type": "string",
+				"title": "Name"
+			},
+			"shortName": {
+				"type": "string",
+				"title": "Short Name"
+			},
+			"maker": {
+				"type": "string",
+				"title": "Maker"
+			},
+			"version": {
+				"type": "string",
+				"title": "Version"
+			},
+			"otaFirmware": {
+				"type": "string",
+				"title": "OTA Firmare Update",
+				"description": "Select a firmware binary to upload and install on your device"
+			}
+		},
+		"required": [
+			"otaFirmware"
+		]
+	};
+
+	const firmwareUiSchema = {
+		"name": {
+			"ui:readonly": true
+		},
+		"shortName": {
+			"ui:readonly": true
+		},
+		"maker": {
+			"ui:readonly": true
+		},
+		"version": {
+			"ui:readonly": true
+		},
+		"otaFirmware": {
+			"ui:widget": "file"
+		}
+	};
+
+
+	/**
+	 * Loads MQTT config form
+	 *
+	 * @param {string} device_address Device address (IP or hostname)
+	 * @returns {void}
+	 */
+	function loadMqttForm(device_address)
+	{
+		$.when(getApi(device_address, "mqtt"))
+			.done(function(data, statusText, jqXHR)
+			{
+				var mqttData = data;
+        
+				if (mqttData.connected)
+				{
+					showAlert("Device is connected to MQTT broker", "success")
+				}
+				else
+				{
+					showAlert("Device is NOT connected to MQTT broker", "warning")
+				}
+
+				// Render MQTT form
+				ReactDOM.render( /*#__PURE__*/
+				React.createElement(mqtt_form,
+				{
+					schema: mqttSchema,
+					uiSchema: mqttUiSchema,
+					validate: mqttValidate,
+					formData: mqttData,
+					showErrorList: false,
+					onError: onError,
+					onSubmit: function(data)
+					{
+						postApi(device_address, "mqtt", data.formData);
+					}
+				}),
+				document.getElementById("mqtt_form"));
+			})
+			.fail(function()
+			{
+				showAlert("Failed to load MQTT action");
+			});
+	}
+
+	/**
+	 * Validate MQTT config form
+	 */
+	function mqttValidate(formData, errors)
+	{
+		if (formData.username && !formData.password)
+		{
+			errors.password.addError("Password is mandatory if username specified");
+		}
+
+		return errors;
+	}
 
 	/**
 	 * Loads firmware config form
@@ -73,12 +235,10 @@
 		$.when(getApi(device_address, "adopt"), getApi(device_address, "config"))
 			.done(function(adopt, config)
 			{
-				// Hide other forms
-				$('#addr_form').hide('fast');
-				$('#cmnd_form').hide('fast');
-        
 				var configSchema = adopt[0].configSchema;
 				var configData = config[0];
+
+				hideAlert();
 
 				// Render config form
 				ReactDOM.render( /*#__PURE__*/
@@ -86,6 +246,8 @@
 				{
 					schema: configSchema,
 					formData: configData,
+					showErrorList: false,
+					onError: onError,
 					onSubmit: function(data)
 					{
 						postApi(device_address, "config", data.formData);
@@ -95,7 +257,7 @@
 			})
 			.fail(function()
 			{
-				alert(`Failed to load config action`);
+				showAlert("Failed to load config action");
 			});
 	}
 
@@ -111,17 +273,17 @@
 		$.when(getApi(device_address, "adopt"))
 			.done(function(data, statusText, jqXHR)
 			{
-				// Hide other forms
-				$('#addr_form').hide('fast');
-				$('#conf_form').hide('fast');
-        
 				var commandSchema = data.commandSchema;
+
+				hideAlert();
 
 				// Render command form
 				ReactDOM.render( /*#__PURE__*/
 				React.createElement(cmnd_form,
 				{
 					schema: commandSchema,
+					showErrorList: false,
+					onError: onError,
 					onSubmit: function(data)
 					{
 						postApi(device_address, "command", data.formData);
@@ -131,7 +293,45 @@
 			})
 			.fail(function()
 			{
-				alert(`Failed to load command action`);
+				showAlert("Failed to load command action");
+			});
+	}
+
+
+	/**
+	 * Loads firmware form
+	 *
+	 * @param {string} device_address Device address (IP or hostname)
+	 * @returns {void}
+	 */
+	function loadFirmwareForm(device_address)
+	{
+		$.when(getApi(device_address, "adopt"))
+			.done(function(data, statusText, jqXHR)
+			{
+				var firmwareData = data.firmware;
+
+				hideAlert();
+
+				// Render firmware form
+				ReactDOM.render( /*#__PURE__*/
+				React.createElement(fw_form,
+				{
+					schema: firmwareSchema,
+					uiSchema: firmwareUiSchema,
+					formData: firmwareData,
+					showErrorList: false,
+					onError: onError,
+					onSubmit: function(data)
+					{
+						postApiOta(device_address, data.formData.otaFirmware);
+					}
+				}),
+				document.getElementById("fw_form"));
+			})
+			.fail(function()
+			{
+				showAlert("Failed to load firmware action");
 			});
 	}
 
@@ -148,8 +348,7 @@
 		return $.ajax({
 			url: `http://${device_address}/api/${endpoint}`,
 			method: 'GET',
-			dataType: 'json',
-			crossDomain: true
+			dataType: 'json'
 		});
 	}
 
@@ -167,22 +366,80 @@
 		$.ajax({
 			url: `http://${device_address}/api/${endpoint}`,
 			method: 'POST',
-			crossDomain: true,
 			data: JSON.stringify(data),
 			statusCode:
 			{
-				404: function() { alert("Error: Device not found"); },
-				204: function() { alert("Success!"); },
+				404: function() { showAlert("Device not found", "danger"); },
+				204: function() { showAlert("Successfully updated your device"); },
 			},
 			error: function(xhr, status, error)
 			{
-				alert(error || 'Unknown error');
+				showAlert(error || "Unknown error", "danger");
 			}
 		});
 	}
 
 
 	/**
+	 * Create API POST request for an OTA update
+	 *
+	 * @param {string} device_address Device IP address
+	 * @param {string} endpoint API endpoint
+	 * @param {json} data API payload
+	 * @returns {void}
+	 */
+	function postApiOta(device_address, fileDataUrl)
+	{
+		// Convert the selected file from `data-url` format to a binary blob
+		let fileBase64 = String(fileDataUrl).split(',', 2)[1];
+		let fileBinary = Uint8Array.from(atob(fileBase64), c => c.codePointAt(0));
+    
+		showAlert("Uploading new firmware to device, please wait...", "warning");
+    
+		$.ajax({
+			url: `http://${device_address}/api/ota`,
+			method: 'POST',
+			data: fileBinary,
+			contentType: "application/octet-stream",
+			processData: false,
+			statusCode:
+			{
+				404: function() { showAlert("Device not found", "danger"); },
+				204: function() { showAlert("Successfully uploaded OTA firmware update. Device should now reboot."); },
+			},
+			error: function(xhr, status, error)
+			{
+				showAlert(error || "Unknown error", "danger");
+			}
+		});
+	}
+
+	function onError(errors)
+	{
+		$('.alert_container').html(`<div></div>`);
+
+		for (let i = 0; i < errors.length; i++)
+		{
+			$('.alert_container').append(`<div class="alert alert-danger" role="alert">${errors[i].stack}</div>`);
+		}
+    
+		$('.alert_container').show('fast');
+	}
+
+	function showAlert(msg, type)
+	{
+		type = type || 'success';
+
+		$('.alert_container').html(`<div class="alert alert-${type}" role="alert">${msg}</div>`);
+		$('.alert_container').show('fast');
+	}
+	
+	function hideAlert(msg, type)
+	{
+		$('.alert_container').hide('fast');
+	}
+	
+  /**
 	 * Main program: loads inital device address form
 	 * Called once all elements are ready/loaded
 	 *
@@ -193,26 +450,39 @@
 		// Render device address form
 		ReactDOM.render( /*#__PURE__*/
 			React.createElement(addr_form,
-			{
-				schema: addressSchema,
-				uiSchema: addressUiSchema,
-				formData: addressData,
-				onSubmit: function(data)
 				{
-					// Load the form for the selected action
-					if (data.formData.action === "mqtt") {
-						window.location.href = `http://${data.formData.address}`;
-					} else if (data.formData.action === "config") {
-						loadConfigForm(data.formData.address);
-					} else if (data.formData.action === "command") {
-						loadCommandForm(data.formData.address);
-					} else if (data.formData.action === "ota") {
-						window.location.href = `http://${data.formData.address}/ota`;
-					} else {
-						alert(`Unsupported action: ${data.formData.action}`);
+					schema: addressSchema,
+					uiSchema: addressUiSchema,
+					showErrorList: false,
+					onSubmit: function(data)
+					{
+						showAlert("Loading...", "info");
+            
+						// Hide other forms
+						$('#mqtt_form').hide('fast');
+						$('#conf_form').hide('fast');
+						$('#cmnd_form').hide('fast');
+						$('#fw_form').hide('fast');
+
+						// Load the form for the selected action
+						if (data.formData.action === "mqtt") {
+							$('#mqtt_form').show('fast');
+							loadMqttForm(data.formData.address);
+						} else if (data.formData.action === "config") {
+							$('#conf_form').show('fast');
+							loadConfigForm(data.formData.address);
+						} else if (data.formData.action === "command") {
+							$('#cmnd_form').show('fast');
+							loadCommandForm(data.formData.address);
+						} else if (data.formData.action === "firmware") {
+							$('#fw_form').show('fast');
+							loadFirmwareForm(data.formData.address);
+						}
 					}
-				}
-			}),
+				},
+				React.createElement("div", null,
+				React.createElement("button", { type: "submit", class: "btn btn-info" }, "Select"))
+			),
 			document.getElementById("addr_form")
 		);
 	});
@@ -223,6 +493,15 @@
 <body>
 	<div class="container">
 		<div id="addr_form"></div>
+	</div>
+	<div class="container">
+		<div class="alert_container"/>
+	</div>
+	<div class="container">
+		<div id="fw_form"></div>
+	</div>
+	<div class="container">
+		<div id="mqtt_form"></div>
 	</div>
 	<div class="container">
 		<div id="conf_form"></div>
