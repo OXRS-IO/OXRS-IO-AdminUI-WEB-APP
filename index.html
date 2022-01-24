@@ -181,12 +181,13 @@
         
 				if (mqttData.connected)
 				{
-					showAlert("Device is connected to MQTT broker", "success")
+					showSuccess("Device is connected to MQTT broker")
 				}
 				else
 				{
-					showAlert("Device is NOT connected to MQTT broker", "warning")
+					showWarning("Device is NOT connected to MQTT broker")
 				}
+				$('#mqtt_form').show('fast');
 
 				// Render MQTT form
 				ReactDOM.render( /*#__PURE__*/
@@ -207,7 +208,7 @@
 			})
 			.fail(function()
 			{
-				showAlert("Failed to load MQTT action");
+				showError("Failed to load MQTT action");
 			});
 	}
 
@@ -239,6 +240,7 @@
 				var configData = config[0];
 
 				hideAlert();
+				$('#conf_form').show('fast');
 
 				// Render config form
 				ReactDOM.render( /*#__PURE__*/
@@ -257,7 +259,7 @@
 			})
 			.fail(function()
 			{
-				showAlert("Failed to load config action");
+				showError("Failed to load config action");
 			});
 	}
 
@@ -276,6 +278,7 @@
 				var commandSchema = data.commandSchema;
 
 				hideAlert();
+				$('#cmnd_form').show('fast');
 
 				// Render command form
 				ReactDOM.render( /*#__PURE__*/
@@ -293,7 +296,7 @@
 			})
 			.fail(function()
 			{
-				showAlert("Failed to load command action");
+				showError("Failed to load command action");
 			});
 	}
 
@@ -312,6 +315,7 @@
 				var firmwareData = data.firmware;
 
 				hideAlert();
+				$('#fw_form').show('fast');
 
 				// Render firmware form
 				ReactDOM.render( /*#__PURE__*/
@@ -331,7 +335,7 @@
 			})
 			.fail(function()
 			{
-				showAlert("Failed to load firmware action");
+				showError("Failed to load firmware action");
 			});
 	}
 
@@ -369,12 +373,12 @@
 			data: JSON.stringify(data),
 			statusCode:
 			{
-				404: function() { showAlert("Device not found", "danger"); },
-				204: function() { showAlert("Successfully updated your device"); },
+				404: function() { showError("Device not found"); },
+				204: function() { showSuccess("Successfully updated your device"); },
 			},
 			error: function(xhr, status, error)
 			{
-				showAlert(error || "Unknown error", "danger");
+				showError(error || "Unknown error");
 			}
 		});
 	}
@@ -393,9 +397,9 @@
 		// Convert the selected file from `data-url` format to a binary blob
 		let fileBase64 = String(fileDataUrl).split(',', 2)[1];
 		let fileBinary = Uint8Array.from(atob(fileBase64), c => c.codePointAt(0));
-    
-		showAlert("Uploading new firmware to device, please wait...", "warning");
-    
+
+		showWarning("Uploading new firmware to device, please wait...");
+
 		$.ajax({
 			url: `http://${device_address}/api/ota`,
 			method: 'POST',
@@ -404,32 +408,38 @@
 			processData: false,
 			statusCode:
 			{
-				404: function() { showAlert("Device not found", "danger"); },
-				204: function() { showAlert("Successfully uploaded OTA firmware update. Device should now reboot."); },
+				404: function() { showError("Device not found"); },
+				204: function() { showSuccess("Successfully uploaded OTA firmware update. Device should now reboot."); },
 			},
 			error: function(xhr, status, error)
 			{
-				showAlert(error || "Unknown error", "danger");
+				showError(error || "Unknown error");
 			}
 		});
 	}
 
-	function onError(errors)
+	function showInfo(msg)
 	{
-		$('.alert_container').html(`<div></div>`);
-
-		for (let i = 0; i < errors.length; i++)
-		{
-			$('.alert_container').append(`<div class="alert alert-danger" role="alert">${errors[i].stack}</div>`);
-		}
-    
-		$('.alert_container').show('fast');
+		showAlert(msg, "info");
 	}
-
+	
+	function showSuccess(msg)
+	{
+		showAlert(msg, "success");
+	}
+	
+	function showWarning(msg)
+	{
+		showAlert(msg, "warning");
+	}
+	
+	function showError(msg)
+	{
+		showAlert(msg, "danger");
+	}
+	
 	function showAlert(msg, type)
 	{
-		type = type || 'success';
-
 		$('.alert_container').html(`<div class="alert alert-${type}" role="alert">${msg}</div>`);
 		$('.alert_container').show('fast');
 	}
@@ -439,6 +449,18 @@
 		$('.alert_container').hide('fast');
 	}
 	
+	function onError(errors)
+	{
+		$('.alert_container').html(`<div></div>`);
+
+		for (let i = 0; i < errors.length; i++)
+		{
+			$('.alert_container').append(`<div class="alert alert-danger" role="alert">${errors[i].stack}</div>`);
+		}
+
+		$('.alert_container').show('fast');
+	}
+
   /**
 	 * Main program: loads inital device address form
 	 * Called once all elements are ready/loaded
@@ -456,7 +478,7 @@
 					showErrorList: false,
 					onSubmit: function(data)
 					{
-						showAlert("Loading...", "info");
+						showInfo("Loading...");
             
 						// Hide other forms
 						$('#mqtt_form').hide('fast');
@@ -466,16 +488,12 @@
 
 						// Load the form for the selected action
 						if (data.formData.action === "mqtt") {
-							$('#mqtt_form').show('fast');
 							loadMqttForm(data.formData.address);
 						} else if (data.formData.action === "config") {
-							$('#conf_form').show('fast');
 							loadConfigForm(data.formData.address);
 						} else if (data.formData.action === "command") {
-							$('#cmnd_form').show('fast');
 							loadCommandForm(data.formData.address);
 						} else if (data.formData.action === "firmware") {
-							$('#fw_form').show('fast');
 							loadFirmwareForm(data.formData.address);
 						}
 					}
