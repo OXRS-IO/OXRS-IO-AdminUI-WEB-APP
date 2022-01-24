@@ -22,10 +22,10 @@
 	<script>
 
 	const addr_form = JSONSchemaForm.default;
-	const fw_form = JSONSchemaForm.default;
 	const mqtt_form = JSONSchemaForm.default;
 	const conf_form = JSONSchemaForm.default;
 	const cmnd_form = JSONSchemaForm.default;
+	const fw_form = JSONSchemaForm.default;
 
 	/* JSON schema for initial address page */
 	const addressSchema = {
@@ -58,11 +58,6 @@
 		}
 	};
 
-	/* JSON data for initial address page - default to 'Setup MQTT' */
-	const addressData = {
-		"action": "mqtt"
-	};
-
 
 	/* JSON schema for MQTT setup page */
 	const mqttSchema = {
@@ -75,7 +70,7 @@
 				"title": "Broker Address"
 			},
 			"port": {
-				"type": "integer",
+				"type": "string",
 				"title": "Broker Port"
 			},
 			"clientId": {
@@ -140,12 +135,34 @@
 			"version": {
 				"type": "string",
 				"title": "Version"
+			},
+			"otaFirmware": {
+				"type": "string",
+				"title": "OTA Firmare Update",
+				"description": "Select a firmware binary to upload and install on your device"
 			}
-		}
+		},
+		"required": [
+			"otaFirmware"
+		]
 	};
 
 	const firmwareUiSchema = {
-    "ui:readonly": true
+		"name": {
+			"ui:readonly": true
+		},
+		"shortName": {
+			"ui:readonly": true
+		},
+		"maker": {
+			"ui:readonly": true
+		},
+		"version": {
+			"ui:readonly": true
+		},
+		"otaFirmware": {
+			"ui:widget": "file"
+		}
 	};
 
 
@@ -160,12 +177,6 @@
 		$.when(getApi(device_address, "mqtt"))
 			.done(function(data, statusText, jqXHR)
 			{
-				// Hide other forms
-				$('#addr_form').hide('fast');
-				$('#fw_form').hide('fast');
-				$('#cmnd_form').hide('fast');
-				$('#conf_form').hide('fast');
-        
 				var mqttData = data;
         
 				// Render MQTT form
@@ -214,12 +225,6 @@
 		$.when(getApi(device_address, "adopt"), getApi(device_address, "config"))
 			.done(function(adopt, config)
 			{
-				// Hide other forms
-				$('#addr_form').hide('fast');
-				$('#fw_form').hide('fast');
-				$('#mqtt_form').hide('fast');
-				$('#cmnd_form').hide('fast');
-        
 				var configSchema = adopt[0].configSchema;
 				var configData = config[0];
 
@@ -254,12 +259,6 @@
 		$.when(getApi(device_address, "adopt"))
 			.done(function(data, statusText, jqXHR)
 			{
-				// Hide other forms
-				$('#addr_form').hide('fast');
-				$('#fw_form').hide('fast');
-				$('#mqtt_form').hide('fast');
-				$('#conf_form').hide('fast');
-        
 				var commandSchema = data.commandSchema;
 
 				// Render command form
@@ -292,12 +291,6 @@
 		$.when(getApi(device_address, "adopt"))
 			.done(function(data, statusText, jqXHR)
 			{
-				// Hide other forms
-				$('#addr_form').hide('fast');
-				$('#mqtt_form').hide('fast');
-				$('#cmnd_form').hide('fast');
-				$('#conf_form').hide('fast');
-        
 				var firmwareData = data.firmware;
 
 				// Render firmware form
@@ -307,6 +300,10 @@
 					schema: firmwareSchema,
 					uiSchema: firmwareUiSchema,
 					formData: firmwareData,
+					onSubmit: function(data)
+					{
+						postApiOta(device_address, data.formData.otaFirmware);
+					}
 				}),
 				document.getElementById("fw_form"));
 			})
@@ -329,8 +326,7 @@
 		return $.ajax({
 			url: `http://${device_address}/api/${endpoint}`,
 			method: 'GET',
-			dataType: 'json',
-			crossDomain: true
+			dataType: 'json'
 		});
 	}
 
@@ -348,8 +344,40 @@
 		$.ajax({
 			url: `http://${device_address}/api/${endpoint}`,
 			method: 'POST',
-			crossDomain: true,
 			data: JSON.stringify(data),
+			statusCode:
+			{
+				404: function() { alert("Error: Device not found"); },
+				204: function() { alert("Success!"); },
+			},
+			error: function(xhr, status, error)
+			{
+				alert(error || 'Unknown error');
+			}
+		});
+	}
+
+
+	/**
+	 * Create API POST request for an OTA update
+	 *
+	 * @param {string} device_address Device IP address
+	 * @param {string} endpoint API endpoint
+	 * @param {json} data API payload
+	 * @returns {void}
+	 */
+	function postApiOta(device_address, fileDataUrl)
+	{
+		// Convert the selected file from `data-url` format to a binary blob
+		let fileBase64 = String(fileDataUrl).split(',', 2)[1];
+		let fileBinary = Uint8Array.from(atob(fileBase64), c => c.codePointAt(0));
+    
+		$.ajax({
+			url: `http://${device_address}/api/ota`,
+			method: 'POST',
+			data: fileBinary,
+			contentType: "application/octet-stream",
+			processData: false,
 			statusCode:
 			{
 				404: function() { alert("Error: Device not found"); },
@@ -374,26 +402,36 @@
 		// Render device address form
 		ReactDOM.render( /*#__PURE__*/
 			React.createElement(addr_form,
-			{
-				schema: addressSchema,
-				uiSchema: addressUiSchema,
-				formData: addressData,
-				onSubmit: function(data)
 				{
-					// Load the form for the selected action
-					if (data.formData.action === "mqtt") {
-						loadMqttForm(data.formData.address);
-					} else if (data.formData.action === "config") {
-						loadConfigForm(data.formData.address);
-					} else if (data.formData.action === "command") {
-						loadCommandForm(data.formData.address);
-					} else if (data.formData.action === "firmware") {
-						loadFirmwareForm(data.formData.address);
-					} else {
-						alert(`Unsupported action: ${data.formData.action}`);
+					schema: addressSchema,
+					uiSchema: addressUiSchema,
+					onSubmit: function(data)
+					{
+						// Hide other forms
+						$('#mqtt_form').hide('fast');
+						$('#conf_form').hide('fast');
+						$('#cmnd_form').hide('fast');
+						$('#fw_form').hide('fast');
+
+						// Load the form for the selected action
+						if (data.formData.action === "mqtt") {
+							$('#mqtt_form').show('fast');
+							loadMqttForm(data.formData.address);
+						} else if (data.formData.action === "config") {
+							$('#conf_form').show('fast');
+							loadConfigForm(data.formData.address);
+						} else if (data.formData.action === "command") {
+							$('#cmnd_form').show('fast');
+							loadCommandForm(data.formData.address);
+						} else if (data.formData.action === "firmware") {
+							$('#fw_form').show('fast');
+							loadFirmwareForm(data.formData.address);
+						}
 					}
-				}
-			}),
+				},
+				React.createElement("div", null,
+				React.createElement("button", { type: "submit", class: "btn btn-info" }, "Select"))
+			),
 			document.getElementById("addr_form")
 		);
 	});
@@ -406,6 +444,9 @@
 		<div id="addr_form"></div>
 	</div>
 	<div class="container">
+		<div id="fw_form"></div>
+	</div>
+	<div class="container">
 		<div id="mqtt_form"></div>
 	</div>
 	<div class="container">
@@ -413,9 +454,6 @@
 	</div>
 	<div class="container">
 		<div id="cmnd_form"></div>
-	</div>
-	<div class="container">
-		<div id="fw_form"></div>
 	</div>
 </body>
 
