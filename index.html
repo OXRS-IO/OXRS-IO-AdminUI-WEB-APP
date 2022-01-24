@@ -26,6 +26,7 @@
 	const conf_form = JSONSchemaForm.default;
 	const cmnd_form = JSONSchemaForm.default;
 	const fw_form = JSONSchemaForm.default;
+	const system_form = JSONSchemaForm.default;
 
 	/* JSON schema for initial address page */
 	const addressSchema = {
@@ -39,8 +40,8 @@
 				"description": "IP address or hostname of your OXRS device"
 			},
 			"action": {
-				"enum": [ "mqtt", "config", "command", "firmware" ],
-				"enumNames": [ "Setup MQTT", "Edit Config", "Send Command", "View Firmware" ],
+				"enum": [ "mqtt", "config", "command", "firmware", "system" ],
+				"enumNames": [ "Setup MQTT", "Edit Config", "Send Command", "View Firmware", "System" ],
 				"title": "Action",
 				"description": "Administrative action to perform on your OXRS device"
 			}
@@ -163,6 +164,28 @@
 		"otaFirmware": {
 			"ui:widget": "file"
 		}
+	};
+
+
+	/* JSON schema for system page */
+	const systemSchema = {
+		"$schema": "http://json-schema.org/draft-07/schema#",
+		"title": "OXRS System",
+		"type": "object",
+		"properties": {
+			"restart": {
+				"type": "boolean",
+				"title": "Restart"
+			},
+			"factoryReset": {
+				"type": "boolean",
+				"title": "Factory Reset",
+			}
+		}
+	};
+
+
+	const systemUiSchema = {
 	};
 
 
@@ -341,6 +364,43 @@
 
 
 	/**
+	 * Loads system form
+	 *
+	 * @param {string} device_address Device address (IP or hostname)
+	 * @returns {void}
+	 */
+	function loadSystemForm(device_address)
+	{
+		hideAlert();
+		$('#system_form').show('fast');
+
+		// Render system form
+		ReactDOM.render( /*#__PURE__*/
+		React.createElement(system_form,
+		{
+			schema: systemSchema,
+			uiSchema: systemUiSchema,
+			showErrorList: false,
+			onError: onError,
+			onSubmit: function(data)
+			{
+				if (data.formData.factoryReset)
+				{
+					showWarning("Factory resetting your device, please wait...");
+					postApi(device_address, "factoryReset", null);
+				}
+				else if (data.formData.restart)
+				{
+					showWarning("Restarting your device, please wait...");
+					postApi(device_address, "restart", null);
+				}
+			}
+		}),
+		document.getElementById("system_form"));
+	}
+
+
+	/**
 	 * Create API GET request
 	 *
 	 * @param {string} device_address Device IP address
@@ -484,6 +544,7 @@
 						$('#conf_form').hide('fast');
 						$('#cmnd_form').hide('fast');
 						$('#fw_form').hide('fast');
+						$('#system_form').hide('fast');
 
 						// Load the form for the selected action
 						if (data.formData.action === "mqtt") {
@@ -494,6 +555,8 @@
 							loadCommandForm(data.formData.address);
 						} else if (data.formData.action === "firmware") {
 							loadFirmwareForm(data.formData.address);
+						} else if (data.formData.action === "system") {
+							loadSystemForm(data.formData.address);
 						}
 					}
 				},
@@ -515,9 +578,6 @@
 		<div class="alert_container"/>
 	</div>
 	<div class="container">
-		<div id="fw_form"></div>
-	</div>
-	<div class="container">
 		<div id="mqtt_form"></div>
 	</div>
 	<div class="container">
@@ -525,6 +585,12 @@
 	</div>
 	<div class="container">
 		<div id="cmnd_form"></div>
+	</div>
+	<div class="container">
+		<div id="fw_form"></div>
+	</div>
+	<div class="container">
+		<div id="system_form"></div>
 	</div>
 </body>
 
