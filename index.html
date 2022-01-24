@@ -179,6 +179,15 @@
 			{
 				var mqttData = data;
         
+				if (mqttData.connected)
+				{
+					showAlert("Device is connected to MQTT broker", "success")
+				}
+				else
+				{
+					showAlert("Device is NOT connected to MQTT broker", "warning")
+				}
+
 				// Render MQTT form
 				ReactDOM.render( /*#__PURE__*/
 				React.createElement(mqtt_form,
@@ -187,6 +196,7 @@
 					uiSchema: mqttUiSchema,
 					validate: mqttValidate,
 					formData: mqttData,
+					showErrorList: false,
 					onSubmit: function(data)
 					{
 						postApi(device_address, "mqtt", data.formData);
@@ -196,7 +206,7 @@
 			})
 			.fail(function()
 			{
-				alert(`Failed to load MQTT action`);
+				showAlert(`Failed to load MQTT action`);
 			});
 	}
 
@@ -213,7 +223,6 @@
 		return errors;
 	}
 
-
 	/**
 	 * Loads firmware config form
 	 *
@@ -228,12 +237,15 @@
 				var configSchema = adopt[0].configSchema;
 				var configData = config[0];
 
+				hideAlert();
+
 				// Render config form
 				ReactDOM.render( /*#__PURE__*/
 				React.createElement(conf_form,
 				{
 					schema: configSchema,
 					formData: configData,
+					showErrorList: false,
 					onSubmit: function(data)
 					{
 						postApi(device_address, "config", data.formData);
@@ -243,7 +255,7 @@
 			})
 			.fail(function()
 			{
-				alert(`Failed to load config action`);
+				showAlert(`Failed to load config action`);
 			});
 	}
 
@@ -261,11 +273,14 @@
 			{
 				var commandSchema = data.commandSchema;
 
+				hideAlert();
+
 				// Render command form
 				ReactDOM.render( /*#__PURE__*/
 				React.createElement(cmnd_form,
 				{
 					schema: commandSchema,
+					showErrorList: false,
 					onSubmit: function(data)
 					{
 						postApi(device_address, "command", data.formData);
@@ -275,7 +290,7 @@
 			})
 			.fail(function()
 			{
-				alert(`Failed to load command action`);
+				showAlert(`Failed to load command action`);
 			});
 	}
 
@@ -293,6 +308,8 @@
 			{
 				var firmwareData = data.firmware;
 
+				hideAlert();
+
 				// Render firmware form
 				ReactDOM.render( /*#__PURE__*/
 				React.createElement(fw_form,
@@ -300,6 +317,7 @@
 					schema: firmwareSchema,
 					uiSchema: firmwareUiSchema,
 					formData: firmwareData,
+					showErrorList: false,
 					onSubmit: function(data)
 					{
 						postApiOta(device_address, data.formData.otaFirmware);
@@ -309,7 +327,7 @@
 			})
 			.fail(function()
 			{
-				alert(`Failed to load firmware action`);
+				showAlert(`Failed to load firmware action`);
 			});
 	}
 
@@ -347,12 +365,12 @@
 			data: JSON.stringify(data),
 			statusCode:
 			{
-				404: function() { alert("Error: Device not found"); },
-				204: function() { alert("Success!"); },
+				404: function() { showAlert("Device not found", "danger"); },
+				204: function() { showAlert("Successfully updated your device"); },
 			},
 			error: function(xhr, status, error)
 			{
-				alert(error || 'Unknown error');
+				showAlert(error || "Unknown error", "danger");
 			}
 		});
 	}
@@ -372,6 +390,8 @@
 		let fileBase64 = String(fileDataUrl).split(',', 2)[1];
 		let fileBinary = Uint8Array.from(atob(fileBase64), c => c.codePointAt(0));
     
+		showAlert("Uploading new firmware to device, please wait...", "warning");
+    
 		$.ajax({
 			url: `http://${device_address}/api/ota`,
 			method: 'POST',
@@ -380,18 +400,30 @@
 			processData: false,
 			statusCode:
 			{
-				404: function() { alert("Error: Device not found"); },
-				204: function() { alert("Success!"); },
+				404: function() { showAlert("Device not found", "danger"); },
+				204: function() { showAlert("Successfully uploaded OTA firmware update. Device should now reboot."); },
 			},
 			error: function(xhr, status, error)
 			{
-				alert(error || 'Unknown error');
+				showAlert(error || "Unknown error", "danger");
 			}
 		});
 	}
 
+	function showAlert(msg, type)
+	{
+		type = type || 'success';
 
-	/**
+		$('.alert_container').html(`<div class="alert alert-${type}" role="alert">${msg}</div>`);
+		$('.alert_container').show('fast');
+	}
+	
+	function hideAlert(msg, type)
+	{
+		$('.alert_container').hide('fast');
+	}
+	
+  /**
 	 * Main program: loads inital device address form
 	 * Called once all elements are ready/loaded
 	 *
@@ -405,8 +437,11 @@
 				{
 					schema: addressSchema,
 					uiSchema: addressUiSchema,
+					showErrorList: false,
 					onSubmit: function(data)
 					{
+						showAlert("Loading...", "info");
+            
 						// Hide other forms
 						$('#mqtt_form').hide('fast');
 						$('#conf_form').hide('fast');
@@ -442,6 +477,9 @@
 <body>
 	<div class="container">
 		<div id="addr_form"></div>
+	</div>
+	<div class="container">
+		<div class="alert_container"/>
 	</div>
 	<div class="container">
 		<div id="fw_form"></div>
