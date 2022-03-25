@@ -177,9 +177,17 @@
 				"type": "boolean",
 				"title": "Restart"
 			},
+			"resetWifi": {
+				"type": "boolean",
+				"title": "Reset Wifi Credentials"
+			},
+			"resetConfig": {
+				"type": "boolean",
+				"title": "Reset Configuration"
+			},
 			"factoryReset": {
 				"type": "boolean",
-				"title": "Factory Reset",
+				"title": "Factory Reset"
 			}
 		}
 	};
@@ -384,6 +392,16 @@
 			onError: onError,
 			onSubmit: function(data)
 			{
+				if (data.formData.resetWifi)
+				{
+					showWarning("Resetting WiFi credentials, please wait...");
+					postApi(device_address, "resetWifi", null);
+				}
+				if (data.formData.resetConfig)
+				{
+					showWarning("Resetting device configuration, please wait...");
+					postApi(device_address, "resetConfig", null);
+				}
 				if (data.formData.factoryReset)
 				{
 					showWarning("Factory resetting your device, please wait...");
