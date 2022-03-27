@@ -393,8 +393,8 @@
 				if (data.hasOwnProperty("system"))
 				{
 					firmwareData.size = 
-						Math.round(data.system.sketchSpaceUsedBytes / 1024) + "kB / " + 
-						Math.round(data.system.sketchSpaceTotalBytes / 1024) + "kB (" + 
+						Math.round(data.system.sketchSpaceUsedBytes / 1024) + " kB / " + 
+						Math.round(data.system.sketchSpaceTotalBytes / 1024) + " kB (" + 
 						Math.round(100 * (data.system.sketchSpaceUsedBytes / data.system.sketchSpaceTotalBytes)) + "%)";
 				}
 				else
@@ -446,21 +446,21 @@
 				{
 					// NOTE: used/max allocated is not available for ESP8266s
 					systemData.heap = 
-						Math.round(data.system.heapUsedBytes / 1024) + "kB / " + 
-						Math.round(data.system.heapFreeBytes / 1024) + "kB / " + 
-						Math.round(data.system.heapMaxAllocBytes / 1024) + "kB";
+						Math.round(data.system.heapUsedBytes / 1024) + " kB / " + 
+						Math.round(data.system.heapFreeBytes / 1024) + " kB / " + 
+						Math.round(data.system.heapMaxAllocBytes / 1024) + " kB";
 					
 					systemData.flash = 
-						Math.round(data.system.flashChipSizeBytes / 1024) + "kB";
+						Math.round(data.system.flashChipSizeBytes / 1024) + " kB";
 
 					systemData.program = 
-						Math.round(data.system.sketchSpaceUsedBytes / 1024) + "kB / " + 
-						Math.round(data.system.sketchSpaceTotalBytes / 1024) + "kB (" + 
+						Math.round(data.system.sketchSpaceUsedBytes / 1024) + " kB / " + 
+						Math.round(data.system.sketchSpaceTotalBytes / 1024) + " kB (" + 
 						Math.round(100 * (data.system.sketchSpaceUsedBytes / data.system.sketchSpaceTotalBytes)) + "%)"; 
 
 					systemData.fileSystem = 
-						Math.round(data.system.fileSystemUsedBytes / 1024) + "kB / " + 
-						Math.round(data.system.fileSystemTotalBytes / 1024) + "kB (" + 
+						Math.round(data.system.fileSystemUsedBytes / 1024) + " kB / " + 
+						Math.round(data.system.fileSystemTotalBytes / 1024) + " kB (" + 
 						Math.round(100 * (data.system.fileSystemUsedBytes / data.system.fileSystemTotalBytes)) + "%)"; 
 				}
 				else
