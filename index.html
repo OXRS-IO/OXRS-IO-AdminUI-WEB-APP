@@ -17,6 +17,15 @@
 
 	<style>
 		.container { margin-top: 2rem; margin-bottom: 2rem; }
+		
+		@media (prefers-color-scheme: dark) {
+			body {background: #101010; color: #fff;}
+			legend {color: #fff;}
+			.form-control{background-color: #303030; color: #fff;}
+			.form-control[readonly]{background-color: #303030; color: #fff;}
+			.form-control::-webkit-input-placeholder { color: #8f8f8F;}
+			input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:active,input:-webkit-autofill:focus{-webkit-text-fill-color: #fff !important; -webkit-box-shadow: 0 0 0 1000px #303030 inset !important;}
+		}
 	</style>
 
 	<script>
