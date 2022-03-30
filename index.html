@@ -147,6 +147,10 @@
 				"type": "string",
 				"title": "Version"
 			},
+			"size": {
+				"type": "string",
+				"title": "Size"
+			},
 			"otaFirmware": {
 				"type": "string",
 				"title": "OTA Firmare Update",
@@ -171,6 +175,9 @@
 		"version": {
 			"ui:readonly": true
 		},
+		"size": {
+			"ui:readonly": true
+		},
 		"otaFirmware": {
 			"ui:widget": "file"
 		}
@@ -183,27 +190,64 @@
 		"title": "OXRS System",
 		"type": "object",
 		"properties": {
-			"restart": {
-				"type": "boolean",
-				"title": "Restart"
+			"heap": {
+				"type": "string",
+				"title": "Heap",
+				"description": "Used / Free / Max Allocated"
 			},
-			"resetWifi": {
-				"type": "boolean",
-				"title": "Reset Wifi Credentials"
+			"flash": {
+				"type": "string",
+				"title": "Flash",
+				"description": "Chip Size"
 			},
-			"resetConfig": {
-				"type": "boolean",
-				"title": "Reset Configuration"
+			"program": {
+				"type": "string",
+				"title": "Program",
+				"description": "Used / Total"
 			},
-			"factoryReset": {
-				"type": "boolean",
-				"title": "Factory Reset"
+			"fileSystem": {
+				"type": "string",
+				"title": "File System",
+				"description": "Used / Total"
+			},
+			"actions": {
+				"title": "Actions",
+				"type": "object",
+				"properties": {
+					"restart": {
+						"type": "boolean",
+						"title": "Restart"
+					},
+					"resetWifi": {
+						"type": "boolean",
+						"title": "Reset Wifi Credentials"
+					},
+					"resetConfig": {
+						"type": "boolean",
+						"title": "Reset Configuration"
+					},
+					"factoryReset": {
+						"type": "boolean",
+						"title": "Factory Reset"
+					}
+				}
 			}
 		}
 	};
 
-
 	const systemUiSchema = {
+		"heap": {
+			"ui:readonly": true
+		},
+		"flash": {
+			"ui:readonly": true
+		},
+		"program": {
+			"ui:readonly": true
+		},
+		"fileSystem": {
+			"ui:readonly": true
+		},
 	};
 
 
@@ -219,7 +263,7 @@
 			.done(function(data, statusText, jqXHR)
 			{
 				var mqttData = data;
-        
+				
 				if (mqttData.connected)
 				{
 					showSuccess("Device is connected to MQTT broker")
@@ -354,7 +398,20 @@
 			.done(function(data, statusText, jqXHR)
 			{
 				var firmwareData = data.firmware;
-
+				
+				// Display memory details if they are available
+				if (data.hasOwnProperty("system"))
+				{
+					firmwareData.size = 
+						Math.round(data.system.sketchSpaceUsedBytes / 1024) + " kB / " + 
+						Math.round(data.system.sketchSpaceTotalBytes / 1024) + " kB (" + 
+						Math.round(100 * (data.system.sketchSpaceUsedBytes / data.system.sketchSpaceTotalBytes)) + "%)";
+				}
+				else
+				{
+					firmwareData.size = "(Not Available)";
+				}
+				
 				hideAlert();
 				$('#fw_form').show('fast');
 
@@ -389,43 +446,84 @@
 	 */
 	function loadSystemForm(device_address)
 	{
-		hideAlert();
-		$('#system_form').show('fast');
-
-		// Render system form
-		ReactDOM.render( /*#__PURE__*/
-		React.createElement(system_form,
-		{
-			schema: systemSchema,
-			uiSchema: systemUiSchema,
-			showErrorList: false,
-			onError: onError,
-			onSubmit: function(data)
+		$.when(getApi(device_address, "adopt"))
+			.done(function(data, statusText, jqXHR)
 			{
-				if (data.formData.resetWifi)
+				var systemData = {};
+
+				// Display memory details if they are available
+				if (data.hasOwnProperty("system"))
 				{
-					showWarning("Resetting WiFi credentials, please wait...");
-					postApi(device_address, "resetWifi", null);
+					// NOTE: used/max allocated is not available for ESP8266s
+					systemData.heap = 
+						Math.round(data.system.heapUsedBytes / 1024) + " kB / " + 
+						Math.round(data.system.heapFreeBytes / 1024) + " kB / " + 
+						Math.round(data.system.heapMaxAllocBytes / 1024) + " kB";
+					
+					systemData.flash = 
+						Math.round(data.system.flashChipSizeBytes / 1024) + " kB";
+
+					systemData.program = 
+						Math.round(data.system.sketchSpaceUsedBytes / 1024) + " kB / " + 
+						Math.round(data.system.sketchSpaceTotalBytes / 1024) + " kB (" + 
+						Math.round(100 * (data.system.sketchSpaceUsedBytes / data.system.sketchSpaceTotalBytes)) + "%)"; 
+
+					systemData.fileSystem = 
+						Math.round(data.system.fileSystemUsedBytes / 1024) + " kB / " + 
+						Math.round(data.system.fileSystemTotalBytes / 1024) + " kB (" + 
+						Math.round(100 * (data.system.fileSystemUsedBytes / data.system.fileSystemTotalBytes)) + "%)"; 
 				}
-				if (data.formData.resetConfig)
+				else
 				{
-					showWarning("Resetting device configuration, please wait...");
-					postApi(device_address, "resetConfig", null);
+					systemData.heap = "(Not available)";
+					systemData.flash = "(Not available)";
+					systemData.program = "(Not available)";
+					systemData.fileSystem = "(Not available)";
 				}
-				if (data.formData.factoryReset)
+
+				hideAlert();
+				$('#system_form').show('fast');
+
+				// Render system form
+				ReactDOM.render( /*#__PURE__*/
+				React.createElement(system_form,
 				{
-					showWarning("Factory resetting your device, please wait...");
-					postApi(device_address, "factoryReset", null);
-				}
-				else if (data.formData.restart)
-				{
-					showWarning("Restarting your device, please wait...");
-					postApi(device_address, "restart", null);
-				}
-			}
-		}),
-		document.getElementById("system_form"));
-	}
+					schema: systemSchema,
+					uiSchema: systemUiSchema,
+					formData: systemData,
+					showErrorList: false,
+					onError: onError,
+					onSubmit: function(data)
+					{
+						if (data.formData.actions.resetWifi)
+						{
+							showWarning("Resetting WiFi credentials, please wait...");
+							postApi(device_address, "resetWifi", null);
+						}
+						if (data.formData.actions.resetConfig)
+						{
+							showWarning("Resetting device configuration, please wait...");
+							postApi(device_address, "resetConfig", null);
+						}
+						if (data.formData.actions.factoryReset)
+						{
+							showWarning("Factory resetting your device, please wait...");
+							postApi(device_address, "factoryReset", null);
+						}
+						else if (data.formData.actions.restart)
+						{
+							showWarning("Restarting your device, please wait...");
+							postApi(device_address, "restart", null);
+						}
+					}
+				}),
+				document.getElementById("system_form"));
+			})
+			.fail(function()
+			{
+				showError("Failed to load system action");
+			});
+}
 
 
 	/**
@@ -548,7 +646,7 @@
 		$('.alert_container').show('fast');
 	}
 
-  /**
+	/**
 	 * Main program: loads inital device address form
 	 * Called once all elements are ready/loaded
 	 *
@@ -566,7 +664,7 @@
 					onSubmit: function(data)
 					{
 						showInfo("Loading...");
-            
+
 						// Hide other forms
 						$('#mqtt_form').hide('fast');
 						$('#conf_form').hide('fast');
