@@ -29,7 +29,7 @@
 	</style>
 
 	<script>
-
+		
 	const addr_form = JSONSchemaForm.default;
 	const mqtt_form = JSONSchemaForm.default;
 	const conf_form = JSONSchemaForm.default;
@@ -429,6 +429,14 @@
 					}
 				}),
 				document.getElementById("fw_form"));
+			        if (Math.round(100 * (data.system.sketchSpaceUsedBytes / data.system.sketchSpaceTotalBytes)) >= 75)
+				{
+					document.getElementById("root_size").style.borderColor = "red";
+				}
+				else
+				{
+					document.getElementById("root_size").style.borderColor = "";
+				}
 			})
 			.fail(function()
 			{
@@ -465,7 +473,7 @@
 					systemData.program = 
 						Math.round(data.system.sketchSpaceUsedBytes / 1024) + " kB / " + 
 						Math.round(data.system.sketchSpaceTotalBytes / 1024) + " kB (" + 
-						Math.round(100 * (data.system.sketchSpaceUsedBytes / data.system.sketchSpaceTotalBytes)) + "%)"; 
+						Math.round(100 * (data.system.sketchSpaceUsedBytes / data.system.sketchSpaceTotalBytes)) + "%)";
 
 					systemData.fileSystem = 
 						Math.round(data.system.fileSystemUsedBytes / 1024) + " kB / " + 
@@ -517,6 +525,22 @@
 					}
 				}),
 				document.getElementById("system_form"));
+			        if (Math.round(100 * (data.system.sketchSpaceUsedBytes / data.system.sketchSpaceTotalBytes)) >= 75)
+				{
+					document.getElementById("root_program").style.borderColor = "red";
+				}
+				else
+				{
+					document.getElementById("root_program").style.borderColor = "";
+				}
+				if (Math.round(100 * (data.system.fileSystemUsedBytes / data.system.fileSystemTotalBytes)) >= 75)
+				{
+					document.getElementById("root_fileSystem").style.borderColor = "red";
+				}
+				else
+				{
+					document.getElementById("root_fileSystem").style.borderColor = "";
+				}
 			})
 			.fail(function()
 			{
