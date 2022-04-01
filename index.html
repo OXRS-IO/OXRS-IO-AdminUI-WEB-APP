@@ -29,9 +29,6 @@
 	</style>
 
 	<script>
-
-	var programColor = 0;
-	var fileSystemColor = 0;
 		
 	const addr_form = JSONSchemaForm.default;
 	const mqtt_form = JSONSchemaForm.default;
@@ -408,10 +405,6 @@
 						Math.round(data.system.sketchSpaceUsedBytes / 1024) + " kB / " + 
 						Math.round(data.system.sketchSpaceTotalBytes / 1024) + " kB (" + 
 						Math.round(100 * (data.system.sketchSpaceUsedBytes / data.system.sketchSpaceTotalBytes)) + "%)";
-					        if (Math.round(100 * (data.system.sketchSpaceUsedBytes / data.system.sketchSpaceTotalBytes)) >= 75)
-						{
-							programColor = 1;
-						}
 				}
 				else
 				{
@@ -436,10 +429,9 @@
 					}
 				}),
 				document.getElementById("fw_form"));
-			        if (programColor === 1)
+			        if (Math.round(100 * (data.system.sketchSpaceUsedBytes / data.system.sketchSpaceTotalBytes)) >= 75)
 				{
 					document.getElementById("root_size").style.borderColor = "red";
-					programColor = 0;
 				}
 				else
 				{
@@ -482,19 +474,11 @@
 						Math.round(data.system.sketchSpaceUsedBytes / 1024) + " kB / " + 
 						Math.round(data.system.sketchSpaceTotalBytes / 1024) + " kB (" + 
 						Math.round(100 * (data.system.sketchSpaceUsedBytes / data.system.sketchSpaceTotalBytes)) + "%)";
-					        if (Math.round(100 * (data.system.sketchSpaceUsedBytes / data.system.sketchSpaceTotalBytes)) >= 75)
-						{
-							programColor = 1;
-						}
 
 					systemData.fileSystem = 
 						Math.round(data.system.fileSystemUsedBytes / 1024) + " kB / " + 
 						Math.round(data.system.fileSystemTotalBytes / 1024) + " kB (" + 
 						Math.round(100 * (data.system.fileSystemUsedBytes / data.system.fileSystemTotalBytes)) + "%)"; 
-					        if (Math.round(100 * (data.system.fileSystemUsedBytes / data.system.fileSystemTotalBytes)) >= 75)
-						{
-							fileSystemColor = 1;
-						}
 				}
 				else
 				{
@@ -541,19 +525,17 @@
 					}
 				}),
 				document.getElementById("system_form"));
-			        if (programColor === 1)
+			        if (Math.round(100 * (data.system.sketchSpaceUsedBytes / data.system.sketchSpaceTotalBytes)) >= 75)
 				{
 					document.getElementById("root_program").style.borderColor = "red";
-					programColor = 0;
 				}
 				else
 				{
 					document.getElementById("root_program").style.borderColor = "";
 				}
-				if (fileSystemColor === 1)
+				if (Math.round(100 * (data.system.fileSystemUsedBytes / data.system.fileSystemTotalBytes)) >= 75)
 				{
 					document.getElementById("root_fileSystem").style.borderColor = "red";
-					fileSystemColor = 0;
 				}
 				else
 				{
