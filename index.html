@@ -4,6 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<link rel="icon" href="https://oxrs.io/images/hero.png">
 
 	<title>OXRS Admin</title>
 
@@ -40,7 +41,6 @@
 	/* JSON schema for initial address page */
 	const addressSchema = {
 		"$schema": "http://json-schema.org/draft-07/schema#",
-		"title": "OXRS Admin",
 		"type": "object",
 		"properties": {
 			"address": {
@@ -697,6 +697,12 @@
 
 <body>
 	<div class="container">
+		<legend id="root__title">
+		    <span>
+			  <img class="logo" src="https://oxrs.io/images/hero.png" alt="OXRS Logo" style="width:85px;height:85px;padding:1rem;">
+			  <span class="title">OXRS Admin</span>
+			</span>
+		</legend>
 		<div id="addr_form"></div>
 	</div>
 	<div class="container">
