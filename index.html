@@ -217,7 +217,7 @@
 				"title": "File System",
 				"description": "Used / Total"
 			},
-			"network": {
+			"networkSystem": {
 				"type": "string",
 				"title": "Network"
 				},
@@ -259,7 +259,7 @@
 		"fileSystem": {
 			"ui:readonly": true
 		},
-		"network": {
+		"networkSystem": {
 			"ui:readonly": true
 			},
 	};
@@ -452,7 +452,7 @@
 					}
 				}),
 				document.getElementById("fw_form"));
-				if (data.hasOwnProperty("system")) 
+				if (data.hasOwnProperty("system")) // if information is unavailble this prevents issues with jquery
 				{
 			    	if (Math.round(100 * (data.system.sketchSpaceUsedBytes / data.system.sketchSpaceTotalBytes)) >= 75)
 					{
@@ -463,30 +463,34 @@
 						$('#root_size').css('borderColor', '');
 					}
 				}
-				$('#icons').remove();
-				if (data.hasOwnProperty("network") && data.network.hasOwnProperty("mode")) 
+				$('#icons').remove(); // remove prior icons - otherwise it'll duplicate
+				if (data.hasOwnProperty("network") && data.network.hasOwnProperty("mode")) // if information is unavailble this prevents issues with jquery
 				{
 					if (data.network.mode === "wifi") 
 					{
+						// wifi is the network mode from adopt payload - add the wifi icon
 						$('#root_network').parent().append('<div id="icons"><i class="mdi mdi-wifi" id="wifi-icon" aria-hidden="true" style="color:#2C448E;font-size: 30px;"></i></div>');
 					}
 					else if (data.network.mode === "ethernet") 
 					{
+						// ethernet is the network mode from adopt payload - add the ethernet icon
 						$('#root_network').parent().append('<div id="icons"><i class="mdi mdi-ethernet" id="ethernet-icon" aria-hidden="true" style="color:#2C448E;font-size: 30px;"></i></div>');
 					}
 					else 
 					{
+						// unknown state from the network adopt payload - uses cancel icon
 						$('#root_network').parent().append('<div id="icons"><i class="mdi mdi-cancel" id="unknown-icon" aria-hidden="true" style="color:#2C448E;font-size: 30px;"></i></div>');
 					}
 				}
 				else 
 				{
+					// no adopt network mode available - uses cancel icon
 					$('#root_network').parent().append('<div id="icons"><i class="mdi mdi-cancel" id="unknown-icon" aria-hidden="true" style="color:#2C448E;font-size: 30px;"></i></div>');
 				}
-				$('#root_network').hide();
-				$("#root_otaFirmware").val(null);
-				$('.file-info').hide();
-				$('body').on('change', '#root_otaFirmware', function () {
+				$('#root_network').hide(); // hides the normal jsonschema text input box - and thus only the icons will show
+				$("#root_otaFirmware").val(null); // clears last firmware upload file when firmware page loaded
+				$('.file-info').hide(); // hides the firmware file list information
+				$('body').on('change', '#root_otaFirmware', function () { // will reshow the firmware file list if new file is selected
 					$('.file-info').show();
 				});
 			})
@@ -541,11 +545,11 @@
 				}
 				if (data.hasOwnProperty("network") && data.network.hasOwnProperty("mode")) 
 				{
-					systemData.network = data.network.mode;
+					systemData.networkSystem = data.network.mode;
 				}
 				else 
 				{
-					systemData.network = "(Not Available)";
+					systemData.networkSystem = "(Not Available)";
 				}
 
 				hideAlert();
@@ -585,7 +589,7 @@
 					}
 				}),
 				document.getElementById("system_form"));
-				if (data.hasOwnProperty("system")) 
+				if (data.hasOwnProperty("system")) // if information is unavailble this prevents issues with jquery
 				{
 			    	if (Math.round(100 * (data.system.sketchSpaceUsedBytes / data.system.sketchSpaceTotalBytes)) >= 75)
 					{
@@ -604,26 +608,30 @@
 						$('#root_fileSystem').css('borderColor', '');
 					}
 				}
-				$('#icons').remove();
-				if (data.hasOwnProperty("network") && data.network.hasOwnProperty("mode")) 
+				$('#icons').remove(); // remove prior icons - otherwise it'll duplicate
+				if (data.hasOwnProperty("network") && data.network.hasOwnProperty("mode")) // if information is unavailble this prevents issues with jquery
 				{
 					if (data.network.mode === "wifi") {
-						$('#root_network').parent().append('<div id="icons"><i class="mdi mdi-wifi" id="wifi-icon" aria-hidden="true" style="color:#2C448E;font-size: 30px;"></i></div>');
+						// wifi is the network mode from adopt payload - add the wifi icon
+						$('#root_networkSystem').parent().append('<div id="icons"><i class="mdi mdi-wifi" id="wifi-icon" aria-hidden="true" style="color:#2C448E;font-size: 30px;"></i></div>');
 					}
 					else if (data.network.mode === "ethernet") 
 					{
-						$('#root_network').parent().append('<div id="icons"><i class="mdi mdi-ethernet" id="ethernet-icon" aria-hidden="true" style="color:#2C448E;font-size: 30px;"></i></div>');
+						// ethernet is the network mode from adopt payload - add the ethernet icon
+						$('#root_networkSystem').parent().append('<div id="icons"><i class="mdi mdi-ethernet" id="ethernet-icon" aria-hidden="true" style="color:#2C448E;font-size: 30px;"></i></div>');
 					}
 					else 
 					{
-						$('#root_network').parent().append('<div id="icons"><i class="mdi mdi-cancel" id="unknown-icon" aria-hidden="true" style="color:#2C448E;font-size: 30px;"></i></div>');
+						// unknown state from the network adopt payload - uses cancel icon
+						$('#root_networkSystem').parent().append('<div id="icons"><i class="mdi mdi-cancel" id="unknown-icon" aria-hidden="true" style="color:#2C448E;font-size: 30px;"></i></div>');
 					}
 				}
 				else 
 				{
-					$('#root_network').parent().append('<div id="icons"><i class="mdi mdi-cancel" id="unknown-icon" aria-hidden="true" style="color:#2C448E;font-size: 30px;"></i></div>');
+					// no adopt network mode available - uses cancel icon
+					$('#root_networkSystem').parent().append('<div id="icons"><i class="mdi mdi-cancel" id="unknown-icon" aria-hidden="true" style="color:#2C448E;font-size: 30px;"></i></div>');
 				}
-				$('#root_network').hide();
+				$('#root_networkSystem').hide(); // hides the normal jsonschema text input box - and thus only the icons will show
 			})
 			.fail(function()
 			{
@@ -702,11 +710,8 @@
 				404: function() { showError("Device not found"); },
 				204: function() { 
 					showSuccess("Successfully uploaded OTA firmware update. Device should now reboot."); 
-					$("#root_otaFirmware").val(null);
-					$('.file-info').hide();
-					$('body').on('change', '#root_otaFirmware', function () {
-						$('.file-info').show();
-					}); 
+					$("#root_otaFirmware").val(null); // clears last firmware upload file when upload successful (data will also clear if firmware page is reloaded)
+					$('.file-info').hide(); // hides the firmware file list information
 				},
 			},
 			error: function(xhr, status, error)
