@@ -429,13 +429,17 @@
 					}
 				}),
 				document.getElementById("fw_form"));
+				// if information is unavailble this prevents issues with jquery
+				if (data.hasOwnProperty("system"))
+				{
 			        if (Math.round(100 * (data.system.sketchSpaceUsedBytes / data.system.sketchSpaceTotalBytes)) >= 75)
-				{
-					document.getElementById("root_size").style.borderColor = "red";
-				}
-				else
-				{
-					document.getElementById("root_size").style.borderColor = "";
+					{
+						$('#root_size').css('borderColor', 'red');
+					}
+					else
+					{
+						$('#root_size').css('borderColor', '');
+					}
 				}
 			})
 			.fail(function()
@@ -525,21 +529,25 @@
 					}
 				}),
 				document.getElementById("system_form"));
+				// if information is unavailble this prevents issues with jquery
+				if (data.hasOwnProperty("system"))
+				{
 			        if (Math.round(100 * (data.system.sketchSpaceUsedBytes / data.system.sketchSpaceTotalBytes)) >= 75)
-				{
-					document.getElementById("root_program").style.borderColor = "red";
-				}
-				else
-				{
-					document.getElementById("root_program").style.borderColor = "";
-				}
-				if (Math.round(100 * (data.system.fileSystemUsedBytes / data.system.fileSystemTotalBytes)) >= 75)
-				{
-					document.getElementById("root_fileSystem").style.borderColor = "red";
-				}
-				else
-				{
-					document.getElementById("root_fileSystem").style.borderColor = "";
+					{
+						$('#root_program').css('borderColor', 'red');
+					}
+					else
+					{
+						$('#root_program').css('borderColor', '');
+					}
+					if (Math.round(100 * (data.system.fileSystemUsedBytes / data.system.fileSystemTotalBytes)) >= 75)
+					{
+						$('#root_fileSystem').css('borderColor', 'red');
+					}
+					else
+					{
+						$('#root_fileSystem').css('borderColor', '');
+					}
 				}
 			})
 			.fail(function()
