@@ -183,7 +183,7 @@
 			"ui:readonly": true
 		},
 		"network": {
-				"ui:readonly": true
+			"ui:readonly": true
 			},
 		"otaFirmware": {
 			"ui:widget": "file"
@@ -218,8 +218,8 @@
 				"description": "Used / Total"
 			},
 			"network": {
-					"type": "string",
-					"title": "Network"
+				"type": "string",
+				"title": "Network"
 				},
 			"actions": {
 				"title": "Actions",
@@ -260,7 +260,7 @@
 			"ui:readonly": true
 		},
 		"network": {
-				"ui:readonly": true
+			"ui:readonly": true
 			},
 	};
 
@@ -425,10 +425,12 @@
 				{
 					firmwareData.size = "(Not Available)";
 				}
-				if (data.hasOwnProperty("network") && (data.network.hasOwnProperty("mode"))) {
+				if (data.hasOwnProperty("network") && data.network.hasOwnProperty("mode")) 
+				{
 					firmwareData.network = data.network.mode;
 				}
-				else {
+				else 
+				{
 					firmwareData.network = "(Not Available)";
 				}
 				
@@ -450,7 +452,8 @@
 					}
 				}),
 				document.getElementById("fw_form"));
-				if (data.hasOwnProperty("system")) {
+				if (data.hasOwnProperty("system")) 
+				{
 			    	if (Math.round(100 * (data.system.sketchSpaceUsedBytes / data.system.sketchSpaceTotalBytes)) >= 75)
 					{
 						$('#root_size').css('borderColor', 'red');
@@ -461,18 +464,23 @@
 					}
 				}
 				$('#icons').remove();
-				if (data.hasOwnProperty("network") && (data.network.hasOwnProperty("mode"))) {
-					if (data.network.mode === "wifi") {
+				if (data.hasOwnProperty("network") && data.network.hasOwnProperty("mode")) 
+				{
+					if (data.network.mode === "wifi") 
+					{
 						$('#root_network').parent().append('<div id="icons"><i class="mdi mdi-wifi" id="wifi-icon" aria-hidden="true" style="color:#2C448E;font-size: 30px;"></i></div>');
 					}
-					else if (data.network.mode === "ethernet") {
+					else if (data.network.mode === "ethernet") 
+					{
 						$('#root_network').parent().append('<div id="icons"><i class="mdi mdi-ethernet" id="ethernet-icon" aria-hidden="true" style="color:#2C448E;font-size: 30px;"></i></div>');
 					}
-					else {
+					else 
+					{
 						$('#root_network').parent().append('<div id="icons"><i class="mdi mdi-cancel" id="unknown-icon" aria-hidden="true" style="color:#2C448E;font-size: 30px;"></i></div>');
 					}
 				}
-				else {
+				else 
+				{
 					$('#root_network').parent().append('<div id="icons"><i class="mdi mdi-cancel" id="unknown-icon" aria-hidden="true" style="color:#2C448E;font-size: 30px;"></i></div>');
 				}
 				$('#root_network').hide();
@@ -531,11 +539,13 @@
 					systemData.program = "(Not available)";
 					systemData.fileSystem = "(Not available)";
 				}
-				if (data.hasOwnProperty("network") && (data.network.hasOwnProperty("mode"))) {
-					firmwareData.network = data.network.mode;
+				if (data.hasOwnProperty("network") && data.network.hasOwnProperty("mode")) 
+				{
+					systemData.network = data.network.mode;
 				}
-				else {
-					firmwareData.network = "(Not Available)";
+				else 
+				{
+					systemData.network = "(Not Available)";
 				}
 
 				hideAlert();
@@ -575,7 +585,8 @@
 					}
 				}),
 				document.getElementById("system_form"));
-				if (data.hasOwnProperty("system")) {
+				if (data.hasOwnProperty("system")) 
+				{
 			    	if (Math.round(100 * (data.system.sketchSpaceUsedBytes / data.system.sketchSpaceTotalBytes)) >= 75)
 					{
 						$('#root_program').css('borderColor', 'red');
@@ -592,23 +603,27 @@
 					{
 						$('#root_fileSystem').css('borderColor', '');
 					}
-					$('#icons').remove();
-					if (data.hasOwnProperty("network") && (data.network.hasOwnProperty("mode"))) {
-						if (data.network.mode === "wifi") {
-							$('#root_network').parent().append('<div id="icons"><i class="mdi mdi-wifi" id="wifi-icon" aria-hidden="true" style="color:#2C448E;font-size: 30px;"></i></div>');
-						}
-						else if (data.network.mode === "ethernet") {
-							$('#root_network').parent().append('<div id="icons"><i class="mdi mdi-ethernet" id="ethernet-icon" aria-hidden="true" style="color:#2C448E;font-size: 30px;"></i></div>');
-						}
-						else {
-							$('#root_network').parent().append('<div id="icons"><i class="mdi mdi-cancel" id="unknown-icon" aria-hidden="true" style="color:#2C448E;font-size: 30px;"></i></div>');
-						}
+				}
+				$('#icons').remove();
+				if (data.hasOwnProperty("network") && data.network.hasOwnProperty("mode")) 
+				{
+					if (data.network.mode === "wifi") {
+						$('#root_network').parent().append('<div id="icons"><i class="mdi mdi-wifi" id="wifi-icon" aria-hidden="true" style="color:#2C448E;font-size: 30px;"></i></div>');
 					}
-					else {
+					else if (data.network.mode === "ethernet") 
+					{
+						$('#root_network').parent().append('<div id="icons"><i class="mdi mdi-ethernet" id="ethernet-icon" aria-hidden="true" style="color:#2C448E;font-size: 30px;"></i></div>');
+					}
+					else 
+					{
 						$('#root_network').parent().append('<div id="icons"><i class="mdi mdi-cancel" id="unknown-icon" aria-hidden="true" style="color:#2C448E;font-size: 30px;"></i></div>');
 					}
-					$('#root_network').hide();
 				}
+				else 
+				{
+					$('#root_network').parent().append('<div id="icons"><i class="mdi mdi-cancel" id="unknown-icon" aria-hidden="true" style="color:#2C448E;font-size: 30px;"></i></div>');
+				}
+				$('#root_network').hide();
 			})
 			.fail(function()
 			{
