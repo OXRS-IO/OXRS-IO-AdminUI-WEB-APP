@@ -441,6 +441,12 @@
 						$('#root_size').css('borderColor', '');
 					}
 				}
+				// clears last firmware upload file when firmware page loaded
+				clearFirmwareInput();
+				// will reshow the firmware file list if new file is selected
+				$('body').on('change', '#root_otaFirmware', function () {
+					$('.file-info').show();
+				});
 			})
 			.fail(function()
 			{
@@ -600,6 +606,13 @@
 		});
 	}
 
+	function clearFirmwareInput()
+	{
+		// clears last firmware upload file when upload successful (data will also clear if firmware page is reloaded)
+		$("#root_otaFirmware").val(null);
+		// hides the firmware file list information
+		$('.file-info').hide();
+	}
 
 	/**
 	 * Create API POST request for an OTA update
@@ -625,7 +638,11 @@
 			statusCode:
 			{
 				404: function() { showError("Device not found"); },
-				204: function() { showSuccess("Successfully uploaded OTA firmware update. Device should now reboot."); },
+				204: function() 
+				{ 
+					showSuccess("Successfully uploaded OTA firmware update. Device should now reboot.");
+					clearFirmwareInput();
+				},
 			},
 			error: function(xhr, status, error)
 			{
