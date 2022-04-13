@@ -429,7 +429,7 @@
 					}
 				}),
 				document.getElementById("fw_form"));
-			        if (Math.round(100 * (data.system.sketchSpaceUsedBytes / data.system.sketchSpaceTotalBytes)) >= 75)
+			    if (Math.round(100 * (data.system.sketchSpaceUsedBytes / data.system.sketchSpaceTotalBytes)) >= 75)
 				{
 					$('#root_size').css('borderColor', 'red');
 				}
@@ -437,6 +437,11 @@
 				{
 					$('#root_size').css('borderColor', '');
 				}
+				$("#root_otaFirmware").val(null);
+				$('.file-info').hide();
+				$('body').on('change', '#root_otaFirmware', function () {
+					$('.file-info').show();
+				});
 			})
 			.fail(function()
 			{
@@ -617,7 +622,14 @@
 			statusCode:
 			{
 				404: function() { showError("Device not found"); },
-				204: function() { showSuccess("Successfully uploaded OTA firmware update. Device should now reboot."); },
+				204: function() { 
+					showSuccess("Successfully uploaded OTA firmware update. Device should now reboot."); 
+					$("#root_otaFirmware").val(null);
+					$('.file-info').hide();
+					$('body').on('change', '#root_otaFirmware', function () {
+						$('.file-info').show();
+					}); 
+				},
 			},
 			error: function(xhr, status, error)
 			{
