@@ -429,13 +429,15 @@
 					}
 				}),
 				document.getElementById("fw_form"));
-			    if (Math.round(100 * (data.system.sketchSpaceUsedBytes / data.system.sketchSpaceTotalBytes)) >= 75)
-				{
-					$('#root_size').css('borderColor', 'red');
-				}
-				else
-				{
-					$('#root_size').css('borderColor', '');
+				if (data.hasOwnProperty("system")) {
+			    	if (Math.round(100 * (data.system.sketchSpaceUsedBytes / data.system.sketchSpaceTotalBytes)) >= 75)
+					{
+						$('#root_size').css('borderColor', 'red');
+					}
+					else
+					{
+						$('#root_size').css('borderColor', '');
+					}
 				}
 				$("#root_otaFirmware").val(null);
 				$('.file-info').hide();
@@ -530,21 +532,23 @@
 					}
 				}),
 				document.getElementById("system_form"));
-			        if (Math.round(100 * (data.system.sketchSpaceUsedBytes / data.system.sketchSpaceTotalBytes)) >= 75)
-				{
-					$('#root_program').css('borderColor', 'red');
-				}
-				else
-				{
-					$('#root_program').css('borderColor', '');
-				}
-				if (Math.round(100 * (data.system.fileSystemUsedBytes / data.system.fileSystemTotalBytes)) >= 75)
-				{
-					$('#root_fileSystem').css('borderColor', 'red');
-				}
-				else
-				{
-					$('#root_fileSystem').css('borderColor', '');
+				if (data.hasOwnProperty("system")) {
+			    	if (Math.round(100 * (data.system.sketchSpaceUsedBytes / data.system.sketchSpaceTotalBytes)) >= 75)
+					{
+						$('#root_program').css('borderColor', 'red');
+					}
+					else
+					{
+						$('#root_program').css('borderColor', '');
+					}
+					if (Math.round(100 * (data.system.fileSystemUsedBytes / data.system.fileSystemTotalBytes)) >= 75)
+					{
+						$('#root_fileSystem').css('borderColor', 'red');
+					}
+					else
+					{
+						$('#root_fileSystem').css('borderColor', '');
+					}
 				}
 			})
 			.fail(function()
