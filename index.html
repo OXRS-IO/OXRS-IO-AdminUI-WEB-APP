@@ -431,11 +431,11 @@
 				document.getElementById("fw_form"));
 			        if (Math.round(100 * (data.system.sketchSpaceUsedBytes / data.system.sketchSpaceTotalBytes)) >= 75)
 				{
-					document.getElementById("root_size").style.borderColor = "red";
+					$('#root_size').css('borderColor', 'red');
 				}
 				else
 				{
-					document.getElementById("root_size").style.borderColor = "";
+					$('#root_size').css('borderColor', '');
 				}
 			})
 			.fail(function()
@@ -527,19 +527,19 @@
 				document.getElementById("system_form"));
 			        if (Math.round(100 * (data.system.sketchSpaceUsedBytes / data.system.sketchSpaceTotalBytes)) >= 75)
 				{
-					document.getElementById("root_program").style.borderColor = "red";
+					$('#root_program').css('borderColor', 'red');
 				}
 				else
 				{
-					document.getElementById("root_program").style.borderColor = "";
+					$('#root_program').css('borderColor', '');
 				}
 				if (Math.round(100 * (data.system.fileSystemUsedBytes / data.system.fileSystemTotalBytes)) >= 75)
 				{
-					document.getElementById("root_fileSystem").style.borderColor = "red";
+					$('#root_fileSystem').css('borderColor', 'red');
 				}
 				else
 				{
-					document.getElementById("root_fileSystem").style.borderColor = "";
+					$('#root_fileSystem').css('borderColor', '');
 				}
 			})
 			.fail(function()
