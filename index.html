@@ -152,9 +152,9 @@
 				"title": "Size"
 			},
 			"network": {
-					"type": "string",
-					"title": "Network"
-				},
+				"type": "string",
+				"title": "Network"
+			},
 			"otaFirmware": {
 				"type": "string",
 				"title": "OTA Firmare Update",
@@ -184,7 +184,7 @@
 		},
 		"network": {
 			"ui:readonly": true
-			},
+		},
 		"otaFirmware": {
 			"ui:widget": "file"
 		}
@@ -220,7 +220,7 @@
 			"networkSystem": {
 				"type": "string",
 				"title": "Network"
-				},
+			},
 			"actions": {
 				"title": "Actions",
 				"type": "object",
@@ -261,7 +261,7 @@
 		},
 		"networkSystem": {
 			"ui:readonly": true
-			},
+		},
 	};
 
 
@@ -452,7 +452,8 @@
 					}
 				}),
 				document.getElementById("fw_form"));
-				if (data.hasOwnProperty("system")) // if information is unavailble this prevents issues with jquery
+				// if information is unavailble this prevents issues with jquery
+				if (data.hasOwnProperty("system"))
 				{
 			    	if (Math.round(100 * (data.system.sketchSpaceUsedBytes / data.system.sketchSpaceTotalBytes)) >= 75)
 					{
@@ -463,8 +464,10 @@
 						$('#root_size').css('borderColor', '');
 					}
 				}
-				$('#icons').remove(); // remove prior icons - otherwise it'll duplicate
-				if (data.hasOwnProperty("network") && data.network.hasOwnProperty("mode")) // if information is unavailble this prevents issues with jquery
+				// remove prior icons - otherwise it'll duplicate
+				$('#icons').remove();
+				// if information is unavailble this prevents issues with jquery
+				if (data.hasOwnProperty("network") && data.network.hasOwnProperty("mode"))
 				{
 					if (data.network.mode === "wifi") 
 					{
@@ -487,10 +490,14 @@
 					// no adopt network mode available - uses cancel icon
 					$('#root_network').parent().append('<div id="icons"><i class="mdi mdi-cancel" id="unknown-icon" aria-hidden="true" style="color:#2C448E;font-size: 30px;"></i></div>');
 				}
-				$('#root_network').hide(); // hides the normal jsonschema text input box - and thus only the icons will show
-				$("#root_otaFirmware").val(null); // clears last firmware upload file when firmware page loaded
-				$('.file-info').hide(); // hides the firmware file list information
-				$('body').on('change', '#root_otaFirmware', function () { // will reshow the firmware file list if new file is selected
+				// hides the normal jsonschema text input box - and thus only the icons will show
+				$('#root_network').hide();
+				// clears last firmware upload file when firmware page loaded
+				$("#root_otaFirmware").val(null);
+				// hides the firmware file list information
+				$('.file-info').hide();
+				// will reshow the firmware file list if new file is selected
+				$('body').on('change', '#root_otaFirmware', function () {
 					$('.file-info').show();
 				});
 			})
@@ -589,7 +596,8 @@
 					}
 				}),
 				document.getElementById("system_form"));
-				if (data.hasOwnProperty("system")) // if information is unavailble this prevents issues with jquery
+				// if information is unavailble this prevents issues with jquery
+				if (data.hasOwnProperty("system"))
 				{
 			    	if (Math.round(100 * (data.system.sketchSpaceUsedBytes / data.system.sketchSpaceTotalBytes)) >= 75)
 					{
@@ -608,8 +616,10 @@
 						$('#root_fileSystem').css('borderColor', '');
 					}
 				}
-				$('#icons').remove(); // remove prior icons - otherwise it'll duplicate
-				if (data.hasOwnProperty("network") && data.network.hasOwnProperty("mode")) // if information is unavailble this prevents issues with jquery
+				// remove prior icons - otherwise it'll duplicate
+				$('#icons').remove();
+				// if information is unavailble this prevents issues with jquery
+				if (data.hasOwnProperty("network") && data.network.hasOwnProperty("mode"))
 				{
 					if (data.network.mode === "wifi") {
 						// wifi is the network mode from adopt payload - add the wifi icon
@@ -631,7 +641,8 @@
 					// no adopt network mode available - uses cancel icon
 					$('#root_networkSystem').parent().append('<div id="icons"><i class="mdi mdi-cancel" id="unknown-icon" aria-hidden="true" style="color:#2C448E;font-size: 30px;"></i></div>');
 				}
-				$('#root_networkSystem').hide(); // hides the normal jsonschema text input box - and thus only the icons will show
+				// hides the normal jsonschema text input box - and thus only the icons will show
+				$('#root_networkSystem').hide();
 			})
 			.fail(function()
 			{
@@ -683,6 +694,14 @@
 		});
 	}
 
+	function clearFirmwareInput()
+	{
+		// clears last firmware upload file when upload successful (data will also clear if firmware page is reloaded)
+		$("#root_otaFirmware").val(null);
+		// hides the firmware file list information
+		$('.file-info').hide();
+	}
+
 
 	/**
 	 * Create API POST request for an OTA update
@@ -710,8 +729,7 @@
 				404: function() { showError("Device not found"); },
 				204: function() { 
 					showSuccess("Successfully uploaded OTA firmware update. Device should now reboot."); 
-					$("#root_otaFirmware").val(null); // clears last firmware upload file when upload successful (data will also clear if firmware page is reloaded)
-					$('.file-info').hide(); // hides the firmware file list information
+					clearFirmwareInput();
 				},
 			},
 			error: function(xhr, status, error)
