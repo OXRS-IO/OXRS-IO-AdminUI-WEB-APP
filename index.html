@@ -443,9 +443,10 @@
 					// clears last firmware upload file when firmware page loaded
 					clearFirmwareInput();
 					// will reshow the firmware file list if new file is selected
-					$('body').on('change', '#root_otaFirmware', function () {
-					$('.file-info').show();
-				});
+					$('body').on('change', '#root_otaFirmware', function ()
+					{
+						$('.file-info').show();
+					});
 				}
 			})
 			.fail(function()
