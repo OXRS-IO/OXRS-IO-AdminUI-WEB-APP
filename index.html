@@ -622,7 +622,8 @@
 				// if information is unavailble this prevents issues with jquery
 				if (data.hasOwnProperty("network") && data.network.hasOwnProperty("mode"))
 				{
-					if (data.network.mode === "wifi") {
+					if (data.network.mode === "wifi") 
+					{
 						// wifi is the network mode from adopt payload - add the wifi icon
 						$('#root_networkSystem').parent().append('<div id="icons"><i class="mdi mdi-wifi" id="wifi-icon" aria-hidden="true" style="color:#2C448E;font-size: 30px;"></i></div>');
 					}
