@@ -8,6 +8,7 @@
 
 	<title>OXRS Admin</title>
 
+	<link href="https://cdn.jsdelivr.net/npm/@mdi/font@6.5.95/css/materialdesignicons.min.css" rel="stylesheet">
 	<link href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet">
 
 	<script src="https://unpkg.com/react@17/umd/react.production.min.js" crossorigin></script>
@@ -463,14 +464,42 @@
 					{
 						$('#root_size').css('borderColor', '');
 					}
-					// clears last firmware upload file when firmware page loaded
-					clearFirmwareInput();
-					// will reshow the firmware file list if new file is selected
-					$('body').on('change', '#root_otaFirmware', function ()
-					{
-						$('.file-info').show();
-					});
 				}
+				// remove prior icons - otherwise it'll duplicate
+				$('#icons').remove();
+				// if information is unavailble this prevents issues with jquery
+				if (data.hasOwnProperty("network") && data.network.hasOwnProperty("mode"))
+				{
+					if (data.network.mode === "wifi") 
+					{
+						// wifi is the network mode from adopt payload - add the wifi icon
+						$('#root_network').parent().append('<div id="icons"><i class="mdi mdi-wifi" id="wifi-icon" aria-hidden="true" style="color:#2C448E;font-size: 30px;"></i></div>');
+					}
+					else if (data.network.mode === "ethernet") 
+					{
+						// ethernet is the network mode from adopt payload - add the ethernet icon
+						$('#root_network').parent().append('<div id="icons"><i class="mdi mdi-ethernet" id="ethernet-icon" aria-hidden="true" style="color:#2C448E;font-size: 30px;"></i></div>');
+					}
+					else 
+					{
+						// unknown state from the network adopt payload - uses cancel icon
+						$('#root_network').parent().append('<div id="icons"><i class="mdi mdi-cancel" id="unknown-icon" aria-hidden="true" style="color:#2C448E;font-size: 30px;"></i></div>');
+					}
+				}
+				else 
+				{
+					// no adopt network mode available - uses cancel icon
+					$('#root_network').parent().append('<div id="icons"><i class="mdi mdi-cancel" id="unknown-icon" aria-hidden="true" style="color:#2C448E;font-size: 30px;"></i></div>');
+				}
+				// hides the normal jsonschema text input box - and thus only the icons will show
+				$('#root_network').hide();
+				// clears last firmware upload file when firmware page loaded
+				clearFirmwareInput();
+				// will reshow the firmware file list if new file is selected
+				$('body').on('change', '#root_otaFirmware', function ()
+				{
+					$('.file-info').show();
+				});
 			})
 			.fail(function()
 			{
@@ -588,6 +617,34 @@
 						$('#root_fileSystem').css('borderColor', '');
 					}
 				}
+				// remove prior icons - otherwise it'll duplicate
+				$('#icons').remove();
+				// if information is unavailble this prevents issues with jquery
+				if (data.hasOwnProperty("network") && data.network.hasOwnProperty("mode"))
+				{
+					if (data.network.mode === "wifi") 
+					{
+						// wifi is the network mode from adopt payload - add the wifi icon
+						$('#root_networkSystem').parent().append('<div id="icons"><i class="mdi mdi-wifi" id="wifi-icon" aria-hidden="true" style="color:#2C448E;font-size: 30px;"></i></div>');
+					}
+					else if (data.network.mode === "ethernet") 
+					{
+						// ethernet is the network mode from adopt payload - add the ethernet icon
+						$('#root_networkSystem').parent().append('<div id="icons"><i class="mdi mdi-ethernet" id="ethernet-icon" aria-hidden="true" style="color:#2C448E;font-size: 30px;"></i></div>');
+					}
+					else 
+					{
+						// unknown state from the network adopt payload - uses cancel icon
+						$('#root_networkSystem').parent().append('<div id="icons"><i class="mdi mdi-cancel" id="unknown-icon" aria-hidden="true" style="color:#2C448E;font-size: 30px;"></i></div>');
+					}
+				}
+				else 
+				{
+					// no adopt network mode available - uses cancel icon
+					$('#root_networkSystem').parent().append('<div id="icons"><i class="mdi mdi-cancel" id="unknown-icon" aria-hidden="true" style="color:#2C448E;font-size: 30px;"></i></div>');
+				}
+				// hides the normal jsonschema text input box - and thus only the icons will show
+				$('#root_networkSystem').hide();
 			})
 			.fail(function()
 			{
