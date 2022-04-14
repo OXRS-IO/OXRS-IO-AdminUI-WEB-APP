@@ -25,7 +25,7 @@
 			.form-control{background-color: #303030; color: #fff;}
 			.form-control[readonly]{background-color: #303030; color: #fff;}
 			.form-control::-webkit-input-placeholder { color: #8f8f8F;}
-			input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:active,input:-webkit-autofill:focus{-webkit-text-fill-color: #fff !important; -webkit-box-shadow: 0 0 0 1000px #303030 inset !important;}
+			input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:active,input:-webkit-autofill:focus{-webkit-text-fill-color: #fff !important; box-shadow: 0 0; -webkit-box-shadow: 0 0 0 1000px #303030 inset !important;}
 		}
 	</style>
 
@@ -429,13 +429,17 @@
 					}
 				}),
 				document.getElementById("fw_form"));
-			        if (Math.round(100 * (data.system.sketchSpaceUsedBytes / data.system.sketchSpaceTotalBytes)) >= 75)
+				// if information is unavailble this prevents issues with jquery
+				if (data.hasOwnProperty("system"))
 				{
-					document.getElementById("root_size").style.borderColor = "red";
-				}
-				else
-				{
-					document.getElementById("root_size").style.borderColor = "";
+					if (Math.round(100 * (data.system.sketchSpaceUsedBytes / data.system.sketchSpaceTotalBytes)) >= 75)
+					{
+						$('#root_size').css('borderColor', 'red');
+					}
+					else
+					{
+						$('#root_size').css('borderColor', '');
+					}
 				}
 			})
 			.fail(function()
@@ -525,21 +529,25 @@
 					}
 				}),
 				document.getElementById("system_form"));
-			        if (Math.round(100 * (data.system.sketchSpaceUsedBytes / data.system.sketchSpaceTotalBytes)) >= 75)
+				// if information is unavailble this prevents issues with jquery
+				if (data.hasOwnProperty("system"))
 				{
-					document.getElementById("root_program").style.borderColor = "red";
-				}
-				else
-				{
-					document.getElementById("root_program").style.borderColor = "";
-				}
-				if (Math.round(100 * (data.system.fileSystemUsedBytes / data.system.fileSystemTotalBytes)) >= 75)
-				{
-					document.getElementById("root_fileSystem").style.borderColor = "red";
-				}
-				else
-				{
-					document.getElementById("root_fileSystem").style.borderColor = "";
+					if (Math.round(100 * (data.system.sketchSpaceUsedBytes / data.system.sketchSpaceTotalBytes)) >= 75)
+					{
+						$('#root_program').css('borderColor', 'red');
+					}
+					else
+					{
+						$('#root_program').css('borderColor', '');
+					}
+					if (Math.round(100 * (data.system.fileSystemUsedBytes / data.system.fileSystemTotalBytes)) >= 75)
+					{
+						$('#root_fileSystem').css('borderColor', 'red');
+					}
+					else
+					{
+						$('#root_fileSystem').css('borderColor', '');
+					}
 				}
 			})
 			.fail(function()
