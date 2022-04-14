@@ -150,6 +150,10 @@
 				"type": "string",
 				"title": "Size"
 			},
+			"network": {
+				"type": "string",
+				"title": "Network"
+			},
 			"otaFirmware": {
 				"type": "string",
 				"title": "OTA Firmare Update",
@@ -175,6 +179,9 @@
 			"ui:readonly": true
 		},
 		"size": {
+			"ui:readonly": true
+		},
+		"network": {
 			"ui:readonly": true
 		},
 		"otaFirmware": {
@@ -208,6 +215,10 @@
 				"type": "string",
 				"title": "File System",
 				"description": "Used / Total"
+			},
+			"networkSystem": {
+				"type": "string",
+				"title": "Network"
 			},
 			"actions": {
 				"title": "Actions",
@@ -245,6 +256,9 @@
 			"ui:readonly": true
 		},
 		"fileSystem": {
+			"ui:readonly": true
+		},
+		"networkSystem": {
 			"ui:readonly": true
 		},
 	};
@@ -410,6 +424,15 @@
 				{
 					firmwareData.size = "(Not Available)";
 				}
+				// Display network mode details if available
+				if (data.hasOwnProperty("network") && data.network.hasOwnProperty("mode")) 
+				{
+					firmwareData.network = data.network.mode;
+				}
+				else 
+				{
+					firmwareData.network = "(Not Available)";
+				}
 				
 				hideAlert();
 				$('#fw_form').show('fast');
@@ -497,6 +520,15 @@
 					systemData.flash = "(Not available)";
 					systemData.program = "(Not available)";
 					systemData.fileSystem = "(Not available)";
+				}
+				// Show network mode details if available
+				if (data.hasOwnProperty("network") && data.network.hasOwnProperty("mode")) 
+				{
+					systemData.networkSystem = data.network.mode;
+				}
+				else 
+				{
+					systemData.networkSystem = "(Not Available)";
 				}
 
 				hideAlert();
