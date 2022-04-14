@@ -630,7 +630,7 @@
 						icon = "ethernet";
 					}
 					// inject variables into html to create dynamic icon
-					var html = `<div id=icons><i class="mdi mdi-${icon}" id="${icon}-icon" aria-hidden="true" title="${titleSystem}" style="color:#2C448E;font-size: 30px;"></i></div>`;
+					var html = `<div id=icons><i class="mdi mdi-${icon}" id="${icon}-icon" aria-hidden="true" title="${title}" style="color:#2C448E;font-size: 30px;"></i></div>`;
 					$('#root_networkSystem').parent().append(html);
 					// hide the normal json schema text box so taht only icon visible
 					$('#root_networkSystem').hide();
