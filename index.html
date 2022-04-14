@@ -468,31 +468,26 @@
 				// remove prior icons - otherwise it'll duplicate
 				$('#icons').remove();
 				// if information is unavailble this prevents issues with jquery
-				if (data.hasOwnProperty("network") && data.network.hasOwnProperty("mode"))
+				if (data.hasOwnProperty("network"))
 				{
-					if (data.network.mode === "wifi") 
-					{
-						// wifi is the network mode from adopt payload - add the wifi icon
-						$('#root_network').parent().append('<div id="icons"><i class="mdi mdi-wifi" id="wifi-icon" aria-hidden="true" title="Device Using Wifi" style="color:#2C448E;font-size: 30px;"></i></div>');
+					// dynamically set the title of the icon with adopt network mode information
+					var titleFirmware = firmwareData.network;
+					// default icon is cancel
+					var iconFirmware = "cancel";
+					if (firmwareData.network === "wifi") {
+						// change icon to wifi
+						iconFirmware = "wifi";
 					}
-					else if (data.network.mode === "ethernet") 
-					{
-						// ethernet is the network mode from adopt payload - add the ethernet icon
-						$('#root_network').parent().append('<div id="icons"><i class="mdi mdi-ethernet" id="ethernet-icon" aria-hidden="true" title="Device Using Ethernet" style="color:#2C448E;font-size: 30px;"></i></div>');
+					else if (firmwareData.network === "ethernet") {
+						// change icon to ethernet
+						iconFirmware = "ethernet";
 					}
-					else 
-					{
-						// unknown state from the network adopt payload - uses cancel icon
-						$('#root_network').parent().append('<div id="icons"><i class="mdi mdi-cancel" id="unknown-icon" aria-hidden="true" title="Unknown Network Connection" style="color:#2C448E;font-size: 30px;"></i></div>');
-					}
+					// inject variables into html to create dynamic icon
+					var htmlFirmware = `<div id=icons><i class="mdi mdi-${iconFirmware}" id="${iconFirmware}-icon" aria-hidden="true" title="${titleFirmware}" style="color:#2C448E;font-size: 30px;"></i></div>`;
+					$('#root_network').parent().append(htmlFirmware);
+					// hide the normal json schema text box so that only icon visible
+					$('#root_network').hide();
 				}
-				else 
-				{
-					// no adopt network mode available - uses cancel icon
-					$('#root_network').parent().append('<div id="icons"><i class="mdi mdi-cancel" id="unknown-icon" aria-hidden="true" title="Network Connection Unavailble" style="color:#2C448E;font-size: 30px;"></i></div>');
-				}
-				// hides the normal jsonschema text input box - and thus only the icons will show
-				$('#root_network').hide();
 				// clears last firmware upload file when firmware page loaded
 				clearFirmwareInput();
 				// will reshow the firmware file list if new file is selected
@@ -620,31 +615,26 @@
 				// remove prior icons - otherwise it'll duplicate
 				$('#icons').remove();
 				// if information is unavailble this prevents issues with jquery
-				if (data.hasOwnProperty("network") && data.network.hasOwnProperty("mode"))
+				if (data.hasOwnProperty("network"))
 				{
-					if (data.network.mode === "wifi") 
-					{
-						// wifi is the network mode from adopt payload - add the wifi icon
-						$('#root_networkSystem').parent().append('<div id="icons"><i class="mdi mdi-wifi" id="wifi-icon" aria-hidden="true" title="Device Using Wifi" style="color:#2C448E;font-size: 30px;"></i></div>');
+					// dynamically set the title of the icon with adopt network mode information
+					var titleSystem = systemData.networkSystem;
+					// default icon is cancel
+					var iconSystem = "cancel";
+					if (systemData.networkSystem === "wifi") {
+						// change icon to wifi
+						iconSystem = "wifi";
 					}
-					else if (data.network.mode === "ethernet") 
-					{
-						// ethernet is the network mode from adopt payload - add the ethernet icon
-						$('#root_networkSystem').parent().append('<div id="icons"><i class="mdi mdi-ethernet" id="ethernet-icon" aria-hidden="true" title="Device Using Ethernet" style="color:#2C448E;font-size: 30px;"></i></div>');
+					else if (systemData.networkSystem === "ethernet") {
+						// change icon to ethernet
+						iconSystem = "ethernet";
 					}
-					else 
-					{
-						// unknown state from the network adopt payload - uses cancel icon
-						$('#root_networkSystem').parent().append('<div id="icons"><i class="mdi mdi-cancel" id="unknown-icon" aria-hidden="true" title="Unknown Network Connection" style="color:#2C448E;font-size: 30px;"></i></div>');
-					}
+					// inject variables into html to create dynamic icon
+					var htmlSystem = `<div id=icons><i class="mdi mdi-${iconSystem}" id="${iconSystem}-icon" aria-hidden="true" title="${titleSystem}" style="color:#2C448E;font-size: 30px;"></i></div>`;
+					$('#root_networkSystem').parent().append(htmlSystem);
+					// hide the normal json schema text box so taht only icon visible
+					$('#root_networkSystem').hide();
 				}
-				else 
-				{
-					// no adopt network mode available - uses cancel icon
-					$('#root_networkSystem').parent().append('<div id="icons"><i class="mdi mdi-cancel" id="unknown-icon" aria-hidden="true" title="Network Connection Unavailble" style="color:#2C448E;font-size: 30px;"></i></div>');
-				}
-				// hides the normal jsonschema text input box - and thus only the icons will show
-				$('#root_networkSystem').hide();
 			})
 			.fail(function()
 			{
