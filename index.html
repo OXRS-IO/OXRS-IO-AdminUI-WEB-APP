@@ -473,23 +473,23 @@
 					if (data.network.mode === "wifi") 
 					{
 						// wifi is the network mode from adopt payload - add the wifi icon
-						$('#root_network').parent().append('<div id="icons"><i class="mdi mdi-wifi" id="wifi-icon" aria-hidden="true" style="color:#2C448E;font-size: 30px;"></i></div>');
+						$('#root_network').parent().append('<div id="icons"><i class="mdi mdi-wifi" id="wifi-icon" aria-hidden="true" title="Device Using Wifi" style="color:#2C448E;font-size: 30px;"></i></div>');
 					}
 					else if (data.network.mode === "ethernet") 
 					{
 						// ethernet is the network mode from adopt payload - add the ethernet icon
-						$('#root_network').parent().append('<div id="icons"><i class="mdi mdi-ethernet" id="ethernet-icon" aria-hidden="true" style="color:#2C448E;font-size: 30px;"></i></div>');
+						$('#root_network').parent().append('<div id="icons"><i class="mdi mdi-ethernet" id="ethernet-icon" aria-hidden="true" title="Device Using Ethernet" style="color:#2C448E;font-size: 30px;"></i></div>');
 					}
 					else 
 					{
 						// unknown state from the network adopt payload - uses cancel icon
-						$('#root_network').parent().append('<div id="icons"><i class="mdi mdi-cancel" id="unknown-icon" aria-hidden="true" style="color:#2C448E;font-size: 30px;"></i></div>');
+						$('#root_network').parent().append('<div id="icons"><i class="mdi mdi-cancel" id="unknown-icon" aria-hidden="true" title="Unknown Network Connection" style="color:#2C448E;font-size: 30px;"></i></div>');
 					}
 				}
 				else 
 				{
 					// no adopt network mode available - uses cancel icon
-					$('#root_network').parent().append('<div id="icons"><i class="mdi mdi-cancel" id="unknown-icon" aria-hidden="true" style="color:#2C448E;font-size: 30px;"></i></div>');
+					$('#root_network').parent().append('<div id="icons"><i class="mdi mdi-cancel" id="unknown-icon" aria-hidden="true" title="Network Connection Unavailble" style="color:#2C448E;font-size: 30px;"></i></div>');
 				}
 				// hides the normal jsonschema text input box - and thus only the icons will show
 				$('#root_network').hide();
@@ -625,23 +625,23 @@
 					if (data.network.mode === "wifi") 
 					{
 						// wifi is the network mode from adopt payload - add the wifi icon
-						$('#root_networkSystem').parent().append('<div id="icons"><i class="mdi mdi-wifi" id="wifi-icon" aria-hidden="true" style="color:#2C448E;font-size: 30px;"></i></div>');
+						$('#root_networkSystem').parent().append('<div id="icons"><i class="mdi mdi-wifi" id="wifi-icon" aria-hidden="true" title="Device Using Wifi" style="color:#2C448E;font-size: 30px;"></i></div>');
 					}
 					else if (data.network.mode === "ethernet") 
 					{
 						// ethernet is the network mode from adopt payload - add the ethernet icon
-						$('#root_networkSystem').parent().append('<div id="icons"><i class="mdi mdi-ethernet" id="ethernet-icon" aria-hidden="true" style="color:#2C448E;font-size: 30px;"></i></div>');
+						$('#root_networkSystem').parent().append('<div id="icons"><i class="mdi mdi-ethernet" id="ethernet-icon" aria-hidden="true" title="Device Using Ethernet" style="color:#2C448E;font-size: 30px;"></i></div>');
 					}
 					else 
 					{
 						// unknown state from the network adopt payload - uses cancel icon
-						$('#root_networkSystem').parent().append('<div id="icons"><i class="mdi mdi-cancel" id="unknown-icon" aria-hidden="true" style="color:#2C448E;font-size: 30px;"></i></div>');
+						$('#root_networkSystem').parent().append('<div id="icons"><i class="mdi mdi-cancel" id="unknown-icon" aria-hidden="true" title="Unknown Network Connection" style="color:#2C448E;font-size: 30px;"></i></div>');
 					}
 				}
 				else 
 				{
 					// no adopt network mode available - uses cancel icon
-					$('#root_networkSystem').parent().append('<div id="icons"><i class="mdi mdi-cancel" id="unknown-icon" aria-hidden="true" style="color:#2C448E;font-size: 30px;"></i></div>');
+					$('#root_networkSystem').parent().append('<div id="icons"><i class="mdi mdi-cancel" id="unknown-icon" aria-hidden="true" title="Network Connection Unavailble" style="color:#2C448E;font-size: 30px;"></i></div>');
 				}
 				// hides the normal jsonschema text input box - and thus only the icons will show
 				$('#root_networkSystem').hide();
