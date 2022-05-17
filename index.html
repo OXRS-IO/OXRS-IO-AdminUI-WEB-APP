@@ -51,7 +51,7 @@
 			},
 			"action": {
 				"enum": [ "mqtt", "config", "command", "firmware", "system" ],
-				"enumNames": [ "Setup MQTT", "Edit Config", "Send Command", "View Firmware", "System" ],
+				"enumNames": [ "Setup MQTT", "Edit Config", "Send Command", "Update Firmware", "View System" ],
 				"title": "Action",
 				"description": "Administrative action to perform on your OXRS device"
 			}
@@ -73,7 +73,7 @@
 	/* JSON schema for MQTT setup page */
 	const mqttSchema = {
 		"$schema": "http://json-schema.org/draft-07/schema#",
-		"title": "OXRS MQTT",
+		"title": "MQTT Configuration",
 		"type": "object",
 		"properties": {
 			"broker": {
@@ -128,65 +128,59 @@
 	/* JSON schema for firmware page */
 	const firmwareSchema = {
 		"$schema": "http://json-schema.org/draft-07/schema#",
-		"title": "OXRS Firmware",
 		"type": "object",
 		"properties": {
-			"name": {
-				"type": "string",
-				"title": "Name"
-			},
-			"shortName": {
-				"type": "string",
-				"title": "Short Name"
-			},
-			"maker": {
-				"type": "string",
-				"title": "Maker"
-			},
-			"version": {
-				"type": "string",
-				"title": "Version"
-			},
-			"size": {
-				"type": "string",
-				"title": "Size"
-			},
-			"network": {
-				"type": "string",
-				"title": "Network"
-			},
-			"otaFirmware": {
-				"type": "string",
-				"title": "OTA Firmare Update",
-				"description": "Select a firmware binary to upload and install on your device"
-			}
-		},
-		"required": [
-			"otaFirmware"
-		]
+      "firmware": {
+        "title": "Firmware",
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "shortName": {
+            "type": "string",
+            "title": "Short Name"
+          },
+          "maker": {
+            "type": "string",
+            "title": "Maker"
+          },
+          "version": {
+            "type": "string",
+            "title": "Version"
+          },
+          "size": {
+            "type": "string",
+            "title": "Size"
+          },
+        },
+      },
+      "actions": {
+        "title": "Actions",
+        "type": "object",
+        "properties": {
+          "otaFirmware": {
+            "type": "string",
+            "title": "OTA Firmare Update",
+            "description": "Select a firmware binary to upload and install on your device"
+          },
+        },
+        "required": [
+          "otaFirmware"
+        ]
+      },
+		}
 	};
 
 	const firmwareUiSchema = {
-		"name": {
+		"firmware": {
 			"ui:readonly": true
 		},
-		"shortName": {
-			"ui:readonly": true
-		},
-		"maker": {
-			"ui:readonly": true
-		},
-		"version": {
-			"ui:readonly": true
-		},
-		"size": {
-			"ui:readonly": true
-		},
-		"network": {
-			"ui:readonly": true
-		},
-		"otaFirmware": {
-			"ui:widget": "file"
+		"actions": {
+      "otaFirmware": {
+        "ui:widget": "file"
+      }
 		}
 	};
 
@@ -194,33 +188,52 @@
 	/* JSON schema for system page */
 	const systemSchema = {
 		"$schema": "http://json-schema.org/draft-07/schema#",
-		"title": "OXRS System",
 		"type": "object",
 		"properties": {
-			"heap": {
-				"type": "string",
-				"title": "Heap",
-				"description": "Used / Free / Max Allocated"
-			},
-			"flash": {
-				"type": "string",
-				"title": "Flash",
-				"description": "Chip Size"
-			},
-			"program": {
-				"type": "string",
-				"title": "Program",
-				"description": "Used / Total"
-			},
-			"fileSystem": {
-				"type": "string",
-				"title": "File System",
-				"description": "Used / Total"
-			},
-			"networkSystem": {
-				"type": "string",
-				"title": "Network"
-			},
+      "system": {
+        "title": "System",
+        "type": "object",
+        "properties": {
+          "heap": {
+            "type": "string",
+            "title": "Heap",
+            "description": "Used / Free / Max Allocated"
+          },
+          "flash": {
+            "type": "string",
+            "title": "Flash",
+            "description": "Chip Size"
+          },
+          "program": {
+            "type": "string",
+            "title": "Program",
+            "description": "Used / Total"
+          },
+          "fileSystem": {
+            "type": "string",
+            "title": "File System",
+            "description": "Used / Total"
+          }
+        }
+      },
+      "network": {
+        "title": "Network",
+        "type": "object",
+        "properties": {
+          "ip": {
+            "type": "string",
+            "title": "IP Address"
+          },
+          "mac": {
+            "type": "string",
+            "title": "MAC Address"
+          },
+          "mode": {
+            "type": "string",
+            "title": "Mode"
+          },
+        }
+      },
 			"actions": {
 				"title": "Actions",
 				"type": "object",
@@ -247,19 +260,10 @@
 	};
 
 	const systemUiSchema = {
-		"heap": {
+		"system": {
 			"ui:readonly": true
 		},
-		"flash": {
-			"ui:readonly": true
-		},
-		"program": {
-			"ui:readonly": true
-		},
-		"fileSystem": {
-			"ui:readonly": true
-		},
-		"networkSystem": {
+		"network": {
 			"ui:readonly": true
 		},
 	};
@@ -411,30 +415,21 @@
 		$.when(getApi(device_address, "adopt"))
 			.done(function(data, statusText, jqXHR)
 			{
-				var firmwareData = data.firmware;
+				var firmwareData = { "firmware": data.firmware };
 				
 				// Display memory details if they are available
 				if (data.hasOwnProperty("system"))
 				{
-					firmwareData.size = 
+					firmwareData.firmware.size = 
 						Math.round(data.system.sketchSpaceUsedBytes / 1024) + " kB / " + 
 						Math.round(data.system.sketchSpaceTotalBytes / 1024) + " kB (" + 
 						Math.round(100 * (data.system.sketchSpaceUsedBytes / data.system.sketchSpaceTotalBytes)) + "%)";
 				}
 				else
 				{
-					firmwareData.size = "(Not Available)";
+					firmwareData.firmware.size = "(Not Available)";
 				}
-				// Display network mode details if available
-				if (data.hasOwnProperty("network") && data.network.hasOwnProperty("mode")) 
-				{
-					firmwareData.network = data.network.mode;
-				}
-				else 
-				{
-					firmwareData.network = "(Not Available)";
-				}
-				
+        
 				hideAlert();
 				$('#fw_form').show('fast');
 
@@ -449,49 +444,29 @@
 					onError: onError,
 					onSubmit: function(data)
 					{
-						postApiOta(device_address, data.formData.otaFirmware);
+						postApiOta(device_address, data.formData.actions.otaFirmware);
 					}
 				}),
 				document.getElementById("fw_form"));
+        
 				// if information is unavailble this prevents issues with jquery
 				if (data.hasOwnProperty("system"))
 				{
 					if (Math.round(100 * (data.system.sketchSpaceUsedBytes / data.system.sketchSpaceTotalBytes)) >= 75)
 					{
-						$('#root_size').css('borderColor', 'red');
+						$('#root_firmware_size').css('borderColor', 'red');
 					}
 					else
 					{
-						$('#root_size').css('borderColor', '');
+						$('#root_firmware_size').css('borderColor', '');
 					}
 				}
-				// remove prior icons - otherwise it'll duplicate
-				$('#icons').remove();
-				// if information is unavailble this prevents issues with jquery
-				if (data.hasOwnProperty("network"))
-				{
-					// dynamically set the title of the icon with adopt network mode information
-					var title = firmwareData.network;
-					// default icon is cancel
-					var icon = "cancel";
-					if (firmwareData.network === "wifi") {
-						// change icon to wifi
-						icon = "wifi";
-					}
-					else if (firmwareData.network === "ethernet") {
-						// change icon to ethernet
-						icon = "ethernet";
-					}
-					// inject variables into html to create dynamic icon
-					var html = `<div id=icons><i class="mdi mdi-${icon}" id="${icon}-icon" aria-hidden="true" title="${title}" style="color:#2C448E;font-size: 30px;"></i></div>`;
-					$('#root_network').parent().append(html);
-					// hide the normal json schema text box so that only icon visible
-					$('#root_network').hide();
-				}
+        
 				// clears last firmware upload file when firmware page loaded
 				clearFirmwareInput();
+        
 				// will reshow the firmware file list if new file is selected
-				$('body').on('change', '#root_otaFirmware', function ()
+				$('body').on('change', '#root_actions_otaFirmware', function ()
 				{
 					$('.file-info').show();
 				});
@@ -514,45 +489,53 @@
 		$.when(getApi(device_address, "adopt"))
 			.done(function(data, statusText, jqXHR)
 			{
-				var systemData = {};
+				var systemData = { 
+          "system": {
+            "heap": "(Not available)",
+            "flash": "(Not available)",
+            "program": "(Not available)",
+            "fileSystem": "(Not available)",
+          },
+          "network": {
+            "ip": "(Not available)",
+            "mac": "(Not available)",
+            "mode": "(Not available)",
+          },
+        };
 
 				// Display memory details if they are available
 				if (data.hasOwnProperty("system"))
 				{
 					// NOTE: used/max allocated is not available for ESP8266s
-					systemData.heap = 
+					systemData.system.heap = 
 						Math.round(data.system.heapUsedBytes / 1024) + " kB / " + 
 						Math.round(data.system.heapFreeBytes / 1024) + " kB / " + 
 						Math.round(data.system.heapMaxAllocBytes / 1024) + " kB";
 					
-					systemData.flash = 
+					systemData.system.flash = 
 						Math.round(data.system.flashChipSizeBytes / 1024) + " kB";
 
-					systemData.program = 
+					systemData.system.program = 
 						Math.round(data.system.sketchSpaceUsedBytes / 1024) + " kB / " + 
 						Math.round(data.system.sketchSpaceTotalBytes / 1024) + " kB (" + 
 						Math.round(100 * (data.system.sketchSpaceUsedBytes / data.system.sketchSpaceTotalBytes)) + "%)";
 
-					systemData.fileSystem = 
+					systemData.system.fileSystem = 
 						Math.round(data.system.fileSystemUsedBytes / 1024) + " kB / " + 
 						Math.round(data.system.fileSystemTotalBytes / 1024) + " kB (" + 
 						Math.round(100 * (data.system.fileSystemUsedBytes / data.system.fileSystemTotalBytes)) + "%)"; 
 				}
-				else
+        
+				// Display network details if they are available
+				if (data.hasOwnProperty("network")) 
 				{
-					systemData.heap = "(Not available)";
-					systemData.flash = "(Not available)";
-					systemData.program = "(Not available)";
-					systemData.fileSystem = "(Not available)";
-				}
-				// Show network mode details if available
-				if (data.hasOwnProperty("network") && data.network.hasOwnProperty("mode")) 
-				{
-					systemData.networkSystem = data.network.mode;
-				}
-				else 
-				{
-					systemData.networkSystem = "(Not Available)";
+          systemData.network.ip = data.network.ip;
+          systemData.network.mac = data.network.mac;
+
+          if (data.network.hasOwnProperty("mode"))
+          {
+            systemData.network.mode = data.network.mode;
+          }
 				}
 
 				hideAlert();
@@ -592,55 +575,59 @@
 					}
 				}),
 				document.getElementById("system_form"));
-				// if information is unavailble this prevents issues with jquery
+
+				// if information is unavailable this prevents issues with jquery
 				if (data.hasOwnProperty("system"))
 				{
 					if (Math.round(100 * (data.system.sketchSpaceUsedBytes / data.system.sketchSpaceTotalBytes)) >= 75)
 					{
-						$('#root_program').css('borderColor', 'red');
+						$('#root_system_program').css('borderColor', 'red');
 					}
 					else
 					{
-						$('#root_program').css('borderColor', '');
+						$('#root_system_program').css('borderColor', '');
 					}
 					if (Math.round(100 * (data.system.fileSystemUsedBytes / data.system.fileSystemTotalBytes)) >= 75)
 					{
-						$('#root_fileSystem').css('borderColor', 'red');
+						$('#root_system_fileSystem').css('borderColor', 'red');
 					}
 					else
 					{
-						$('#root_fileSystem').css('borderColor', '');
+						$('#root_system_fileSystem').css('borderColor', '');
 					}
-				}
+				}        
+
 				// remove prior icons - otherwise it'll duplicate
 				$('#icons').remove();
-				// if information is unavailble this prevents issues with jquery
+        
+				// if information is unavailable this prevents issues with jquery
 				if (data.hasOwnProperty("network"))
 				{
-					// dynamically set the title of the icon with adopt network mode information
-					var title = systemData.networkSystem;
-					// default icon is cancel
+					var title = systemData.network.mode;
 					var icon = "cancel";
-					if (systemData.networkSystem === "wifi") {
-						// change icon to wifi
+          
+					if (systemData.network.mode === "wifi")
+          {
 						icon = "wifi";
 					}
-					else if (systemData.networkSystem === "ethernet") {
-						// change icon to ethernet
+					else if (systemData.network.mode === "ethernet")
+          {
 						icon = "ethernet";
 					}
+          
 					// inject variables into html to create dynamic icon
 					var html = `<div id=icons><i class="mdi mdi-${icon}" id="${icon}-icon" aria-hidden="true" title="${title}" style="color:#2C448E;font-size: 30px;"></i></div>`;
-					$('#root_networkSystem').parent().append(html);
-					// hide the normal json schema text box so taht only icon visible
-					$('#root_networkSystem').hide();
+					$('#root_network_mode').parent().append(html);
+					
+          // hide the normal json schema text box so that only icon visible
+					$('#root_network_mode').hide();
 				}
 			})
 			.fail(function()
 			{
 				showError("Failed to load system action");
 			});
-}
+  }
 
 
 	/**
@@ -689,7 +676,8 @@
 	function clearFirmwareInput()
 	{
 		// clears last firmware upload file when upload successful (data will also clear if firmware page is reloaded)
-		$("#root_otaFirmware").val(null);
+		$("#root_ota_otaFirmware").val(null);
+    
 		// hides the firmware file list information
 		$('.file-info').hide();
 	}
