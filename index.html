@@ -130,46 +130,46 @@
 		"$schema": "http://json-schema.org/draft-07/schema#",
 		"type": "object",
 		"properties": {
-      "firmware": {
-        "title": "Firmware",
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string",
-            "title": "Name"
-          },
-          "shortName": {
-            "type": "string",
-            "title": "Short Name"
-          },
-          "maker": {
-            "type": "string",
-            "title": "Maker"
-          },
-          "version": {
-            "type": "string",
-            "title": "Version"
-          },
-          "size": {
-            "type": "string",
-            "title": "Size"
-          },
-        },
-      },
-      "actions": {
-        "title": "Actions",
-        "type": "object",
-        "properties": {
-          "otaFirmware": {
-            "type": "string",
-            "title": "OTA Firmare Update",
-            "description": "Select a firmware binary to upload and install on your device"
-          },
-        },
-        "required": [
-          "otaFirmware"
-        ]
-      },
+			"firmware": {
+				"title": "Firmware",
+				"type": "object",
+				"properties": {
+					"name": {
+						"type": "string",
+						"title": "Name"
+					},
+					"shortName": {
+						"type": "string",
+						"title": "Short Name"
+					},
+					"maker": {
+						"type": "string",
+						"title": "Maker"
+					},
+					"version": {
+						"type": "string",
+						"title": "Version"
+					},
+					"size": {
+						"type": "string",
+						"title": "Size"
+					},
+				},
+			},
+			"actions": {
+				"title": "Actions",
+				"type": "object",
+				"properties": {
+					"otaFirmware": {
+						"type": "string",
+						"title": "OTA Firmare Update",
+						"description": "Select a firmware binary to upload and install on your device"
+					},
+				},
+				"required": [
+					"otaFirmware"
+				]
+			},
 		}
 	};
 
@@ -178,9 +178,9 @@
 			"ui:readonly": true
 		},
 		"actions": {
-      "otaFirmware": {
-        "ui:widget": "file"
-      }
+			"otaFirmware": {
+				"ui:widget": "file"
+			}
 		}
 	};
 
@@ -190,50 +190,50 @@
 		"$schema": "http://json-schema.org/draft-07/schema#",
 		"type": "object",
 		"properties": {
-      "system": {
-        "title": "System",
-        "type": "object",
-        "properties": {
-          "heap": {
-            "type": "string",
-            "title": "Heap",
-            "description": "Used / Free / Max Allocated"
-          },
-          "flash": {
-            "type": "string",
-            "title": "Flash",
-            "description": "Chip Size"
-          },
-          "program": {
-            "type": "string",
-            "title": "Program",
-            "description": "Used / Total"
-          },
-          "fileSystem": {
-            "type": "string",
-            "title": "File System",
-            "description": "Used / Total"
-          }
-        }
-      },
-      "network": {
-        "title": "Network",
-        "type": "object",
-        "properties": {
-          "ip": {
-            "type": "string",
-            "title": "IP Address"
-          },
-          "mac": {
-            "type": "string",
-            "title": "MAC Address"
-          },
-          "mode": {
-            "type": "string",
-            "title": "Mode"
-          },
-        }
-      },
+			"system": {
+				"title": "System",
+				"type": "object",
+				"properties": {
+					"heap": {
+						"type": "string",
+						"title": "Heap",
+						"description": "Used / Free / Max Allocated"
+					},
+					"flash": {
+						"type": "string",
+						"title": "Flash",
+						"description": "Chip Size"
+					},
+					"program": {
+						"type": "string",
+						"title": "Program",
+						"description": "Used / Total"
+					},
+					"fileSystem": {
+						"type": "string",
+						"title": "File System",
+						"description": "Used / Total"
+					}
+				}
+			},
+			"network": {
+				"title": "Network",
+				"type": "object",
+				"properties": {
+					"ip": {
+						"type": "string",
+						"title": "IP Address"
+					},
+					"mac": {
+						"type": "string",
+						"title": "MAC Address"
+					},
+					"mode": {
+						"type": "string",
+						"title": "Mode"
+					},
+				}
+			},
 			"actions": {
 				"title": "Actions",
 				"type": "object",
@@ -429,7 +429,7 @@
 				{
 					firmwareData.firmware.size = "(Not Available)";
 				}
-        
+				
 				hideAlert();
 				$('#fw_form').show('fast');
 
@@ -448,7 +448,7 @@
 					}
 				}),
 				document.getElementById("fw_form"));
-        
+				
 				// if information is unavailble this prevents issues with jquery
 				if (data.hasOwnProperty("system"))
 				{
@@ -461,10 +461,10 @@
 						$('#root_firmware_size').css('borderColor', '');
 					}
 				}
-        
+				
 				// clears last firmware upload file when firmware page loaded
 				clearFirmwareInput();
-        
+				
 				// will reshow the firmware file list if new file is selected
 				$('body').on('change', '#root_actions_otaFirmware', function ()
 				{
@@ -490,18 +490,18 @@
 			.done(function(data, statusText, jqXHR)
 			{
 				var systemData = { 
-          "system": {
-            "heap": "(Not available)",
-            "flash": "(Not available)",
-            "program": "(Not available)",
-            "fileSystem": "(Not available)",
-          },
-          "network": {
-            "ip": "(Not available)",
-            "mac": "(Not available)",
-            "mode": "(Not available)",
-          },
-        };
+					"system": {
+						"heap": "(Not available)",
+						"flash": "(Not available)",
+						"program": "(Not available)",
+						"fileSystem": "(Not available)",
+					},
+					"network": {
+						"ip": "(Not available)",
+						"mac": "(Not available)",
+						"mode": "(Not available)",
+					},
+				};
 
 				// Display memory details if they are available
 				if (data.hasOwnProperty("system"))
@@ -525,17 +525,17 @@
 						Math.round(data.system.fileSystemTotalBytes / 1024) + " kB (" + 
 						Math.round(100 * (data.system.fileSystemUsedBytes / data.system.fileSystemTotalBytes)) + "%)"; 
 				}
-        
+				
 				// Display network details if they are available
 				if (data.hasOwnProperty("network")) 
 				{
-          systemData.network.ip = data.network.ip;
-          systemData.network.mac = data.network.mac;
+					systemData.network.ip = data.network.ip;
+					systemData.network.mac = data.network.mac;
 
-          if (data.network.hasOwnProperty("mode"))
-          {
-            systemData.network.mode = data.network.mode;
-          }
+					if (data.network.hasOwnProperty("mode"))
+					{
+						systemData.network.mode = data.network.mode;
+					}
 				}
 
 				hideAlert();
@@ -599,27 +599,27 @@
 
 				// remove prior icons - otherwise it'll duplicate
 				$('#icons').remove();
-        
+				
 				// if information is unavailable this prevents issues with jquery
 				if (data.hasOwnProperty("network"))
 				{
 					var title = systemData.network.mode;
 					var icon = "cancel";
-          
+					
 					if (systemData.network.mode === "wifi")
-          {
+					{
 						icon = "wifi";
 					}
 					else if (systemData.network.mode === "ethernet")
-          {
+					{
 						icon = "ethernet";
 					}
-          
+					
 					// inject variables into html to create dynamic icon
 					var html = `<div id=icons><i class="mdi mdi-${icon}" id="${icon}-icon" aria-hidden="true" title="${title}" style="color:#2C448E;font-size: 30px;"></i></div>`;
 					$('#root_network_mode').parent().append(html);
 					
-          // hide the normal json schema text box so that only icon visible
+					// hide the normal json schema text box so that only icon visible
 					$('#root_network_mode').hide();
 				}
 			})
@@ -627,7 +627,7 @@
 			{
 				showError("Failed to load system action");
 			});
-  }
+	}
 
 
 	/**
@@ -677,7 +677,7 @@
 	{
 		// clears last firmware upload file when upload successful (data will also clear if firmware page is reloaded)
 		$("#root_ota_otaFirmware").val(null);
-    
+		
 		// hides the firmware file list information
 		$('.file-info').hide();
 	}
