@@ -420,6 +420,7 @@
 			.done(function(data, statusText, jqXHR)
 			{
 				var firmwareData = { "firmware": data.firmware };
+				var validUrl = true;
 				
 				// Display memory details if they are available
 				if (data.hasOwnProperty("system"))
@@ -432,6 +433,12 @@
 				else
 				{
 					firmwareData.firmware.size = "(Not Available)";
+				}
+
+				if (!data.firmware.hasOwnProperty("githubUrl"))
+				{
+					firmwareData.firmware.githubUrl = "(Not Available)";
+					validUrl = false;
 				}
 				
 				hideAlert();
@@ -463,6 +470,28 @@
 					else
 					{
 						$('#root_firmware_size').css('borderColor', '');
+					}
+				}
+
+				// if information is unavailble this prevents issues with jquery
+				if (data.hasOwnProperty("firmware"))
+				{
+					// remove old firmware button
+					$('#button_firmware_githubUrl').remove();
+					// reshow firmware field incase we don't replace it
+					$('#root_firmware_githubUrl').show();
+					// we have a valid URL to show / create a button for
+					if (validUrl == true)
+					{
+						var url = firmwareData.firmware.githubUrl;
+						// inject variables into html to create dynamic icon
+						$('#button_firmware_githubUrl').remove();
+						// inject variables into html to create dynamic url button
+						var html =  `<input class="form-control" id="button_firmware_githubUrl" title="Github URL" style="text-align:left" type="button" onclick="window.open('${url}')" value="${url}">`;
+						// inject our custom HTML where the normal input field would be
+						$('#root_firmware_githubUrl').parent().append(html);
+						// hide the normal json schema text box so that only our html button remains
+				        $('#root_firmware_githubUrl').hide();
 					}
 				}
 				
