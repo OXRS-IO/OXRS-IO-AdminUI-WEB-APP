@@ -484,8 +484,6 @@
 					if (validUrl == true)
 					{
 						var url = firmwareData.firmware.githubUrl;
-						// inject variables into html to create dynamic icon
-						$('#button_firmware_githubUrl').remove();
 						// inject variables into html to create dynamic url button
 						var html =  `<input class="form-control" id="button_firmware_githubUrl" title="Github URL" style="text-align:left" type="button" onclick="window.open('${url}')" value="${url}">`;
 						// inject our custom HTML where the normal input field would be
