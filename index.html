@@ -36,7 +36,7 @@
 	const mqtt_form = JSONSchemaForm.default;
 	const conf_form = JSONSchemaForm.default;
 	const cmnd_form = JSONSchemaForm.default;
-	const fw_form = JSONSchemaForm.default;
+	const firmware_form = JSONSchemaForm.default;
 	const system_form = JSONSchemaForm.default;
 
 	/* JSON schema for initial address page */
@@ -150,13 +150,13 @@
 						"type": "string",
 						"title": "Version"
 					},
-					"githubUrl": {
-						"type": "string",
-						"title": "Github URL",
-					},
 					"size": {
 						"type": "string",
 						"title": "Size"
+					},
+					"githubUrl": {
+						"type": "string",
+						"title": "Github URL",
 					},
 				},
 			},
@@ -435,11 +435,11 @@
 				}
 				
 				hideAlert();
-				$('#fw_form').show('fast');
+				$('#firmware_form').show('fast');
 
 				// Render firmware form
 				ReactDOM.render( /*#__PURE__*/
-				React.createElement(fw_form,
+				React.createElement(firmware_form,
 				{
 					schema: firmwareSchema,
 					uiSchema: firmwareUiSchema,
@@ -451,29 +451,30 @@
 						postApiOta(device_address, data.formData.actions.otaFirmware);
 					}
 				}),
-				document.getElementById("fw_form"));
-				
-				// if information is unavailble this prevents issues with jquery
-				if (data.hasOwnProperty("system"))
-				{
-					if (Math.round(100 * (data.system.sketchSpaceUsedBytes / data.system.sketchSpaceTotalBytes)) >= 75)
-					{
-						$('#root_firmware_size').css('borderColor', 'red');
-					}
-					else
-					{
-						$('#root_firmware_size').css('borderColor', '');
-					}
-				}
-				
-				// clears last firmware upload file when firmware page loaded
-				clearFirmwareInput();
-				
-				// will reshow the firmware file list if new file is selected
-				$('body').on('change', '#root_actions_otaFirmware', function ()
-				{
-					$('.file-info').show();
-				});
+				document.getElementById("firmware_form"));
+
+				// Display a hyperlink to the GitHub repository
+				var url = firmwareData.firmware.githubUrl;
+				var html =  `<div id="link_firmware_githubUrl"> <a href="${url}">${url}</a> </div>`;
+
+				// Remove any custom HTML from previous page loads and re-inject
+				$('#link_firmware_githubUrl').remove();
+				$('#root_firmware_githubUrl').parent().append(html);
+
+				// Hide the auto-rendered input field always
+				$('#root_firmware_githubUrl').hide();
+
+        // Clear selected OTA firmware file
+        $("#root_actions_otaFirmware").val(null);
+        
+        // Hide the firmware file info
+        $('.file-info').hide();
+
+				// Re-show the firmware file info on new selection
+				$('body').on('change', '#root_actions_otaFirmware', function()
+        { 
+          $('.file-info').show();
+        });
 			})
 			.fail(function()
 			{
@@ -535,11 +536,7 @@
 				{
 					systemData.network.ip = data.network.ip;
 					systemData.network.mac = data.network.mac;
-
-					if (data.network.hasOwnProperty("mode"))
-					{
-						systemData.network.mode = data.network.mode;
-					}
+					systemData.network.mode = data.network.mode;
 				}
 
 				hideAlert();
@@ -579,53 +576,6 @@
 					}
 				}),
 				document.getElementById("system_form"));
-
-				// if information is unavailable this prevents issues with jquery
-				if (data.hasOwnProperty("system"))
-				{
-					if (Math.round(100 * (data.system.sketchSpaceUsedBytes / data.system.sketchSpaceTotalBytes)) >= 75)
-					{
-						$('#root_system_program').css('borderColor', 'red');
-					}
-					else
-					{
-						$('#root_system_program').css('borderColor', '');
-					}
-					if (Math.round(100 * (data.system.fileSystemUsedBytes / data.system.fileSystemTotalBytes)) >= 75)
-					{
-						$('#root_system_fileSystem').css('borderColor', 'red');
-					}
-					else
-					{
-						$('#root_system_fileSystem').css('borderColor', '');
-					}
-				}        
-
-				// remove prior icons - otherwise it'll duplicate
-				$('#icons').remove();
-				
-				// if information is unavailable this prevents issues with jquery
-				if (data.hasOwnProperty("network"))
-				{
-					var title = systemData.network.mode;
-					var icon = "cancel";
-					
-					if (systemData.network.mode === "wifi")
-					{
-						icon = "wifi";
-					}
-					else if (systemData.network.mode === "ethernet")
-					{
-						icon = "ethernet";
-					}
-					
-					// inject variables into html to create dynamic icon
-					var html = `<div id=icons><i class="mdi mdi-${icon}" id="${icon}-icon" aria-hidden="true" title="${title}" style="color:#2C448E;font-size: 30px;"></i></div>`;
-					$('#root_network_mode').parent().append(html);
-					
-					// hide the normal json schema text box so that only icon visible
-					$('#root_network_mode').hide();
-				}
 			})
 			.fail(function()
 			{
@@ -649,7 +599,6 @@
 			dataType: 'json'
 		});
 	}
-
 
 	/**
 	 * Create API POST request
@@ -677,15 +626,6 @@
 		});
 	}
 
-	function clearFirmwareInput()
-	{
-		// clears last firmware upload file when upload successful (data will also clear if firmware page is reloaded)
-		$("#root_ota_otaFirmware").val(null);
-		
-		// hides the firmware file list information
-		$('.file-info').hide();
-	}
-
 	/**
 	 * Create API POST request for an OTA update
 	 *
@@ -710,12 +650,7 @@
 			statusCode:
 			{
 				404: function() { showError("Device not found"); },
-				204: function() 
-				{ 
-					showSuccess("Successfully uploaded OTA firmware update. Device should now reboot.");
-					// clear old firmware input on OTA success
-					clearFirmwareInput();
-				},
+				204: function() { showSuccess("Successfully uploaded OTA firmware update. Device should now reboot."); },
 			},
 			error: function(xhr, status, error)
 			{
@@ -790,7 +725,7 @@
 						$('#mqtt_form').hide('fast');
 						$('#conf_form').hide('fast');
 						$('#cmnd_form').hide('fast');
-						$('#fw_form').hide('fast');
+						$('#firmware_form').hide('fast');
 						$('#system_form').hide('fast');
 
 						// Load the form for the selected action
@@ -840,7 +775,7 @@
 		<div id="cmnd_form"></div>
 	</div>
 	<div class="container">
-		<div id="fw_form"></div>
+		<div id="firmware_form"></div>
 	</div>
 	<div class="container">
 		<div id="system_form"></div>
