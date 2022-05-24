@@ -455,14 +455,14 @@
 
 				// Display a hyperlink to the GitHub repository (if the URL exists)
 				var url = firmwareData.firmware.githubUrl;
-        if (url === undefined)
-        {
+				if (url === undefined)
+				{
 				  var html =  `<div id="link_firmware_githubUrl">(Not available)</div>`;
-        }
-        else
-        {
-          var html =  `<div id="link_firmware_githubUrl"><a href="${url}" target="_blank">${url}</a></div>`;
-        }
+				}
+				else
+				{
+					var html =  `<div id="link_firmware_githubUrl"><a href="${url}" target="_blank">${url}</a></div>`;
+				}
 
 				// Remove any custom HTML from previous page loads and re-inject
 				$('#link_firmware_githubUrl').remove();
@@ -471,17 +471,17 @@
 				// Hide the auto-rendered input field always
 				$('#root_firmware_githubUrl').hide();
 
-        // Clear selected OTA firmware file
-        $("#root_actions_otaFirmware").val(null);
-        
-        // Hide the firmware file info
-        $('.file-info').hide();
+				// Clear selected OTA firmware file
+				$("#root_actions_otaFirmware").val(null);
+				
+				// Hide the firmware file info
+				$('.file-info').hide();
 
 				// Re-show the firmware file info on new selection
 				$('body').on('change', '#root_actions_otaFirmware', function()
-        { 
-          $('.file-info').show();
-        });
+				{ 
+					$('.file-info').show();
+				});
 			})
 			.fail(function()
 			{
