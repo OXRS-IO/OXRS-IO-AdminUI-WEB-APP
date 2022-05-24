@@ -156,7 +156,7 @@
 					},
 					"githubUrl": {
 						"type": "string",
-						"title": "Github URL",
+						"title": "Github Link",
 					},
 				},
 			},
@@ -453,9 +453,16 @@
 				}),
 				document.getElementById("firmware_form"));
 
-				// Display a hyperlink to the GitHub repository
+				// Display a hyperlink to the GitHub repository (if the URL exists)
 				var url = firmwareData.firmware.githubUrl;
-				var html =  `<div id="link_firmware_githubUrl"> <a href="${url}">${url}</a> </div>`;
+        if (url === undefined)
+        {
+				  var html =  `<div id="link_firmware_githubUrl">(Not available)</div>`;
+        }
+        else
+        {
+          var html =  `<div id="link_firmware_githubUrl"><a href="${url}" target="_blank">${url}</a></div>`;
+        }
 
 				// Remove any custom HTML from previous page loads and re-inject
 				$('#link_firmware_githubUrl').remove();
